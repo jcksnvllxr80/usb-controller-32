@@ -81,7 +81,7 @@ data:
             value: '8000000'
           type: Dynamic
         - attributes:
-            value: '0'
+            value: '20000000'
           type: User
         type: Values
       type: String
