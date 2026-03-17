@@ -22,8 +22,8 @@ data:
     - children:
       - attributes:
           id: usb_device_hid
-          x: '207'
-          y: '199'
+          x: '217'
+          y: '192'
         type: ElementPosition
       type: ElementPositions
     type: ComponentGraph
