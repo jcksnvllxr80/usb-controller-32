@@ -32,9 +32,48 @@
 #include "mcp23017.h"
 #include "gamepad.h"
 
+extern "C" {
+#include "semphr.h"
+}
+
 static APP_DATA appData;
 static Gamepad gamepad;
 static MCP23017 mcp(MCP23017::DEFAULT_ADDRESS);
+
+// Event semaphore: signaled from ISR callbacks to wake APP_Tasks
+static SemaphoreHandle_t eventSem = nullptr;
+
+// Volatile state shared between ISR callbacks and APP_Tasks
+static volatile bool button1Pressed = false;
+static volatile bool button2Pressed = false;
+static volatile bool buttonChanged = false;
+static volatile bool mcpInterruptPending = false;
+
+// -- ISR Callbacks (called from CN interrupt handler) --
+
+static void onButton1Change(GPIO_PIN pin, uintptr_t context) {
+    bool pressed = (BUTTON_1_Get() != 0);
+    button1Pressed = pressed;
+    buttonChanged = true;
+    if (pressed) { GREEN_LED_Set(); } else { GREEN_LED_Clear(); }
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    xSemaphoreGiveFromISR(eventSem, &xHigherPriorityTaskWoken);
+}
+
+static void onButton2Change(GPIO_PIN pin, uintptr_t context) {
+    bool pressed = (BUTTON_2_Get() != 0);
+    button2Pressed = pressed;
+    buttonChanged = true;
+    if (pressed) { RED_LED_Set(); } else { RED_LED_Clear(); }
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    xSemaphoreGiveFromISR(eventSem, &xHigherPriorityTaskWoken);
+}
+
+static void onMcpInterrupt(GPIO_PIN pin, uintptr_t context) {
+    mcpInterruptPending = true;
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    xSemaphoreGiveFromISR(eventSem, &xHigherPriorityTaskWoken);
+}
 
 void APP_Initialize ( void )
 {
@@ -49,6 +88,7 @@ void APP_Tasks ( void )
         {
             Logger::getInstance().init();
             Logger::getInstance().log("APP", "System starting...");
+            eventSem = xSemaphoreCreateBinary();
             appData.state = APP_STATE_INIT_PERIPHERALS;
             break;
         }
@@ -60,6 +100,20 @@ void APP_Tasks ( void )
                 vTaskDelay(pdMS_TO_TICKS(500));
                 break;
             }
+
+            // Register CN interrupt callbacks
+            GPIO_PinInterruptCallbackRegister(GPIO_PIN_RB14, onButton1Change, 0);
+            GPIO_PinInterruptCallbackRegister(GPIO_PIN_RB15, onButton2Change, 0);
+            GPIO_PinInterruptCallbackRegister(GPIO_PIN_RB5,  onMcpInterrupt, 0);
+            GPIO_PinInterruptCallbackRegister(GPIO_PIN_RB7,  onMcpInterrupt, 0);
+
+            // Enable CN interrupts on all 4 pins
+            BUTTON_1_InterruptEnable();
+            BUTTON_2_InterruptEnable();
+            INTERRUPT_A_InterruptEnable();
+            INTERRUPT_B_InterruptEnable();
+
+            Logger::getInstance().log("APP", "GPIO interrupts enabled");
             appData.state = APP_STATE_USB_OPEN;
             break;
         }
@@ -87,27 +141,25 @@ void APP_Tasks ( void )
 
         case APP_STATE_RUNNING:
         {
-            // Read buttons directly connected to PIC32
-            bool btn1 = (BUTTON_1_Get() != 0);
-            bool btn2 = (BUTTON_2_Get() != 0);
+            // Sleep until a GPIO interrupt fires (or timeout for housekeeping)
+            xSemaphoreTake(eventSem, pdMS_TO_TICKS(100));
 
-            // Drive LEDs: green for button 1, red for button 2
-            if (btn1) { GREEN_LED_Set(); } else { GREEN_LED_Clear(); }
-            if (btn2) { RED_LED_Set(); }   else { RED_LED_Clear(); }
-
-            // Map to gamepad buttons
-            gamepad.setButton(0, btn1);
-            gamepad.setButton(1, btn2);
-
-            // Send USB HID report when configured
-            if (gamepad.isConfigured()) {
-                gamepad.sendReport();
+            // Handle button state changes - update gamepad and send report
+            if (buttonChanged) {
+                buttonChanged = false;
+                gamepad.setButton(0, button1Pressed);
+                gamepad.setButton(1, button2Pressed);
+                if (gamepad.isConfigured()) {
+                    gamepad.sendReport();
+                }
             }
 
-            // Service MCP23017 interrupt pins
-            mcp.handleInterrupts();
+            // Handle MCP23017 interrupts - read registers in task context
+            if (mcpInterruptPending) {
+                mcpInterruptPending = false;
+                mcp.handleInterrupts();
+            }
 
-            vTaskDelay(pdMS_TO_TICKS(1));
             break;
         }
 
