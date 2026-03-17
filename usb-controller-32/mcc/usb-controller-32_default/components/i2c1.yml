@@ -22,8 +22,8 @@ data:
     - children:
       - attributes:
           id: i2c1
-          x: '408'
-          y: '318'
+          x: '630'
+          y: '202'
         type: ElementPosition
       type: ElementPositions
     type: ComponentGraph

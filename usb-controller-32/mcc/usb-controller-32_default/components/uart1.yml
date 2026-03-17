@@ -22,8 +22,8 @@ data:
     - children:
       - attributes:
           id: uart1
-          x: '399'
-          y: '211'
+          x: '405'
+          y: '181'
         type: ElementPosition
       type: ElementPositions
     type: ComponentGraph
