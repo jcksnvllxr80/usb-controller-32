@@ -52,7 +52,7 @@ static volatile bool mcpInterruptPending = false;
 // -- ISR Callbacks (called from CN interrupt handler) --
 
 static void onButton1Change(GPIO_PIN pin, uintptr_t context) {
-    bool pressed = (BUTTON_1_Get() != 0);
+    bool pressed = (BUTTON_1_Get() == 0);
     button1Pressed = pressed;
     buttonChanged = true;
     if (pressed) { GREEN_LED_Set(); } else { GREEN_LED_Clear(); }
@@ -61,7 +61,7 @@ static void onButton1Change(GPIO_PIN pin, uintptr_t context) {
 }
 
 static void onButton2Change(GPIO_PIN pin, uintptr_t context) {
-    bool pressed = (BUTTON_2_Get() != 0);
+    bool pressed = (BUTTON_2_Get() == 0);
     button2Pressed = pressed;
     buttonChanged = true;
     if (pressed) { RED_LED_Set(); } else { RED_LED_Clear(); }
@@ -147,6 +147,9 @@ void APP_Tasks ( void )
             // Handle button state changes - update gamepad and send report
             if (buttonChanged) {
                 buttonChanged = false;
+                Logger::getInstance().logf("[APP] BTN1: %s  BTN2: %s",
+                    button1Pressed ? "PRESSED" : "RELEASED",
+                    button2Pressed ? "PRESSED" : "RELEASED");
                 gamepad.setButton(0, button1Pressed);
                 gamepad.setButton(1, button2Pressed);
                 if (gamepad.isConfigured()) {
@@ -157,6 +160,7 @@ void APP_Tasks ( void )
             // Handle MCP23017 interrupts - read registers in task context
             if (mcpInterruptPending) {
                 mcpInterruptPending = false;
+                Logger::getInstance().log("APP", "MCP23017 interrupt received");
                 mcp.handleInterrupts();
             }
 
