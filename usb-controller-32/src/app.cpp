@@ -28,124 +28,95 @@
 // *****************************************************************************
 
 #include "app.h"
+#include "logger.h"
+#include "mcp23017.h"
+#include "gamepad.h"
 
-// *****************************************************************************
-// *****************************************************************************
-// Section: Global Data Definitions
-// *****************************************************************************
-// *****************************************************************************
-
-// *****************************************************************************
-/* Application Data
-
-  Summary:
-    Holds application data
-
-  Description:
-    This structure holds the application's data.
-
-  Remarks:
-    This structure should be initialized by the APP_Initialize function.
-
-    Application strings and buffers are be defined outside this structure.
-*/
-
-APP_DATA appData;
-
-// *****************************************************************************
-// *****************************************************************************
-// Section: Application Callback Functions
-// *****************************************************************************
-// *****************************************************************************
-
-/* TODO:  Add any necessary callback functions.
-*/
-
-// *****************************************************************************
-// *****************************************************************************
-// Section: Application Local Functions
-// *****************************************************************************
-// *****************************************************************************
-
-
-/* TODO:  Add any necessary local functions.
-*/
-
-
-// *****************************************************************************
-// *****************************************************************************
-// Section: Application Initialization and State Machine Functions
-// *****************************************************************************
-// *****************************************************************************
-
-/*******************************************************************************
-  Function:
-    void APP_Initialize ( void )
-
-  Remarks:
-    See prototype in app.h.
- */
+static APP_DATA appData;
+static Gamepad gamepad;
+static MCP23017 mcp(MCP23017::DEFAULT_ADDRESS);
 
 void APP_Initialize ( void )
 {
-    /* Place the App state machine in its initial state. */
     appData.state = APP_STATE_INIT;
-
-
-
-    /* TODO: Initialize your application's state machine and other
-     * parameters.
-     */
 }
-
-
-/******************************************************************************
-  Function:
-    void APP_Tasks ( void )
-
-  Remarks:
-    See prototype in app.h.
- */
 
 void APP_Tasks ( void )
 {
-
-    /* Check the application's current state. */
     switch ( appData.state )
     {
-        /* Application's initial state. */
         case APP_STATE_INIT:
         {
-            bool appInitialized = true;
-
-
-            if (appInitialized)
-            {
-
-                appData.state = APP_STATE_SERVICE_TASKS;
-            }
+            Logger::getInstance().init();
+            Logger::getInstance().log("APP", "System starting...");
+            appData.state = APP_STATE_INIT_PERIPHERALS;
             break;
         }
 
-        case APP_STATE_SERVICE_TASKS:
+        case APP_STATE_INIT_PERIPHERALS:
         {
-
+            if (!mcp.init()) {
+                Logger::getInstance().log("APP", "MCP23017 init failed, retrying...");
+                vTaskDelay(pdMS_TO_TICKS(500));
+                break;
+            }
+            appData.state = APP_STATE_USB_OPEN;
             break;
         }
 
-        /* TODO: implement your application state machine.*/
+        case APP_STATE_USB_OPEN:
+        {
+            if (!gamepad.open()) {
+                Logger::getInstance().log("APP", "USB open failed, retrying...");
+                vTaskDelay(pdMS_TO_TICKS(500));
+                break;
+            }
+            appData.state = APP_STATE_WAIT_FOR_CONFIGURATION;
+            break;
+        }
 
+        case APP_STATE_WAIT_FOR_CONFIGURATION:
+        {
+            if (gamepad.isConfigured()) {
+                Logger::getInstance().log("APP", "USB configured, entering main loop");
+                appData.state = APP_STATE_RUNNING;
+            }
+            vTaskDelay(pdMS_TO_TICKS(10));
+            break;
+        }
 
-        /* The default state should never be executed. */
+        case APP_STATE_RUNNING:
+        {
+            // Read buttons directly connected to PIC32
+            bool btn1 = (BUTTON_1_Get() != 0);
+            bool btn2 = (BUTTON_2_Get() != 0);
+
+            // Drive LEDs: green for button 1, red for button 2
+            if (btn1) { GREEN_LED_Set(); } else { GREEN_LED_Clear(); }
+            if (btn2) { RED_LED_Set(); }   else { RED_LED_Clear(); }
+
+            // Map to gamepad buttons
+            gamepad.setButton(0, btn1);
+            gamepad.setButton(1, btn2);
+
+            // Send USB HID report when configured
+            if (gamepad.isConfigured()) {
+                gamepad.sendReport();
+            }
+
+            // Service MCP23017 interrupt pins
+            mcp.handleInterrupts();
+
+            vTaskDelay(pdMS_TO_TICKS(1));
+            break;
+        }
+
+        case APP_STATE_ERROR:
         default:
         {
-            /* TODO: Handle error in application's state machine. */
+            Logger::getInstance().log("APP", "Error state");
+            vTaskDelay(pdMS_TO_TICKS(1000));
             break;
         }
     }
 }
-
-
-/*******************************************************************************
- End of File
- */
