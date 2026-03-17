@@ -91,6 +91,8 @@
 #define INTERRUPT_A_Get()               ((PORTB >> 5) & 0x1)
 #define INTERRUPT_A_GetLatch()          ((LATB >> 5) & 0x1)
 #define INTERRUPT_A_PIN                  GPIO_PIN_RB5
+#define INTERRUPT_A_InterruptEnable()   (CNENBSET = (1<<5))
+#define INTERRUPT_A_InterruptDisable()  (CNENBCLR = (1<<5))
 
 /*** Macros for INTERRUPT_B pin ***/
 #define INTERRUPT_B_Set()               (LATBSET = (1<<7))
@@ -101,6 +103,8 @@
 #define INTERRUPT_B_Get()               ((PORTB >> 7) & 0x1)
 #define INTERRUPT_B_GetLatch()          ((LATB >> 7) & 0x1)
 #define INTERRUPT_B_PIN                  GPIO_PIN_RB7
+#define INTERRUPT_B_InterruptEnable()   (CNENBSET = (1<<7))
+#define INTERRUPT_B_InterruptDisable()  (CNENBCLR = (1<<7))
 
 /*** Macros for BUTTON_1 pin ***/
 #define BUTTON_1_Set()               (LATBSET = (1<<14))
@@ -111,6 +115,8 @@
 #define BUTTON_1_Get()               ((PORTB >> 14) & 0x1)
 #define BUTTON_1_GetLatch()          ((LATB >> 14) & 0x1)
 #define BUTTON_1_PIN                  GPIO_PIN_RB14
+#define BUTTON_1_InterruptEnable()   (CNENBSET = (1<<14))
+#define BUTTON_1_InterruptDisable()  (CNENBCLR = (1<<14))
 
 /*** Macros for BUTTON_2 pin ***/
 #define BUTTON_2_Set()               (LATBSET = (1<<15))
@@ -121,6 +127,8 @@
 #define BUTTON_2_Get()               ((PORTB >> 15) & 0x1)
 #define BUTTON_2_GetLatch()          ((LATB >> 15) & 0x1)
 #define BUTTON_2_PIN                  GPIO_PIN_RB15
+#define BUTTON_2_InterruptEnable()   (CNENBSET = (1<<15))
+#define BUTTON_2_InterruptDisable()  (CNENBCLR = (1<<15))
 
 
 // *****************************************************************************
@@ -185,6 +193,7 @@ typedef uint32_t GPIO_PORT;
 
 typedef uint32_t GPIO_PIN;
 
+typedef  void (*GPIO_PIN_CALLBACK) ( GPIO_PIN pin, uintptr_t context);
 
 void GPIO_Initialize(void);
 
@@ -209,6 +218,29 @@ void GPIO_PortToggle(GPIO_PORT port, uint32_t mask);
 void GPIO_PortInputEnable(GPIO_PORT port, uint32_t mask);
 
 void GPIO_PortOutputEnable(GPIO_PORT port, uint32_t mask);
+
+void GPIO_PortInterruptEnable(GPIO_PORT port, uint32_t mask);
+
+void GPIO_PortInterruptDisable(GPIO_PORT port, uint32_t mask);
+
+// *****************************************************************************
+// *****************************************************************************
+// Section: Local Data types and Prototypes
+// *****************************************************************************
+// *****************************************************************************
+
+typedef struct {
+
+    /* target pin */
+    GPIO_PIN                 pin;
+
+    /* Callback for event on target pin*/
+    GPIO_PIN_CALLBACK        callback;
+
+    /* Callback Context */
+    uintptr_t               context;
+
+} GPIO_PIN_CALLBACK_OBJ;
 
 // *****************************************************************************
 // *****************************************************************************
@@ -256,6 +288,21 @@ static inline void GPIO_PinOutputEnable(GPIO_PIN pin)
     GPIO_PortOutputEnable((GPIO_PORT)(pin>>4), 0x1UL << (pin & 0xFU));
 }
 
+static inline void GPIO_PinInterruptEnable(GPIO_PIN pin)
+{
+    GPIO_PortInterruptEnable((GPIO_PORT)(pin>>4), 0x1UL << (pin & 0xFU));
+}
+
+static inline void GPIO_PinInterruptDisable(GPIO_PIN pin)
+{
+    GPIO_PortInterruptDisable((GPIO_PORT)(pin>>4), 0x1UL << (pin & 0xFU));
+}
+
+bool GPIO_PinInterruptCallbackRegister(
+    GPIO_PIN pin,
+    const   GPIO_PIN_CALLBACK callback,
+    uintptr_t context
+);
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
