@@ -202,7 +202,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: '48000000'
+            value: '0'
           type: Dynamic
         type: Values
       type: Integer
@@ -312,7 +312,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: '48000000'
+            value: '0'
           type: Dynamic
         type: Values
       type: Integer
@@ -367,7 +367,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: '48000000'
+            value: '0'
           type: Dynamic
         type: Values
       type: Integer
@@ -526,7 +526,7 @@ data:
             id: enabled
           children:
           - type: Value
-            value: 'true'
+            value: 'false'
           type: Boolean
         type: Attributes
       type: File
@@ -539,7 +539,7 @@ data:
             id: enabled
           children:
           - type: Value
-            value: 'true'
+            value: 'false'
           type: Boolean
         type: Attributes
       type: File
@@ -552,7 +552,7 @@ data:
             id: enabled
           children:
           - type: Value
-            value: 'true'
+            value: 'false'
           type: Boolean
         type: Attributes
       type: File
@@ -562,7 +562,7 @@ data:
       children:
       - children:
         - attributes:
-            value: 'true'
+            value: 'false'
           type: User
         type: Values
       type: Boolean
@@ -1046,7 +1046,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'false'
+            value: 'true'
           type: Dynamic
         type: Values
       type: Boolean
@@ -1057,7 +1057,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'true'
+            value: 'false'
           type: Dynamic
         type: Values
       type: Boolean
@@ -1068,7 +1068,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'true'
+            value: 'false'
           type: Dynamic
         type: Values
       type: Boolean
@@ -1079,7 +1079,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: '30'
+            value: '31'
           type: Dynamic
         type: Values
       type: Hex
@@ -1090,7 +1090,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'true'
+            value: 'false'
           type: Dynamic
         type: Values
       type: Boolean
@@ -1101,7 +1101,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'false'
+            value: 'true'
           type: Dynamic
         type: Values
       type: Boolean
@@ -1112,7 +1112,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'true'
+            value: 'false'
           type: Dynamic
         type: Values
       type: Boolean
@@ -1123,7 +1123,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'true'
+            value: 'false'
           type: Dynamic
         type: Values
       type: Boolean
@@ -1134,7 +1134,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'false'
+            value: 'true'
           type: Dynamic
         type: Values
       type: Boolean
@@ -1145,7 +1145,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'true'
+            value: 'false'
           type: Dynamic
         type: Values
       type: Boolean
@@ -1156,7 +1156,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'false'
+            value: 'true'
           type: Dynamic
         type: Values
       type: Boolean
@@ -1167,7 +1167,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'true'
+            value: 'false'
           type: Dynamic
         type: Values
       type: Boolean
@@ -1178,7 +1178,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'true'
+            value: 'false'
           type: Dynamic
         type: Values
       type: Boolean
@@ -1189,7 +1189,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'false'
+            value: 'true'
           type: Dynamic
         type: Values
       type: Boolean
@@ -1200,7 +1200,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'true'
+            value: 'false'
           type: Dynamic
         type: Values
       type: Boolean
@@ -1211,7 +1211,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'false'
+            value: 'true'
           type: Dynamic
         type: Values
       type: Boolean
@@ -1222,7 +1222,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'false'
+            value: 'true'
           type: Dynamic
         type: Values
       type: Boolean
@@ -1233,7 +1233,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'true'
+            value: 'false'
           type: Dynamic
         type: Values
       type: Boolean
@@ -1244,7 +1244,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'true'
+            value: 'false'
           type: Dynamic
         type: Values
       type: Boolean
@@ -1255,7 +1255,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'true'
+            value: 'false'
           type: Dynamic
         type: Values
       type: Boolean
@@ -1266,7 +1266,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'true'
+            value: 'false'
           type: Dynamic
         type: Values
       type: Boolean
@@ -1277,7 +1277,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'false'
+            value: 'true'
           type: Dynamic
         type: Values
       type: Boolean
@@ -1290,7 +1290,7 @@ data:
             id: enabled
           children:
           - type: Value
-            value: 'true'
+            value: 'false'
           type: Boolean
         type: Attributes
       type: File
@@ -1303,7 +1303,7 @@ data:
             id: enabled
           children:
           - type: Value
-            value: 'true'
+            value: 'false'
           type: Boolean
         type: Attributes
       type: File
@@ -1314,7 +1314,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'false'
+            value: 'true'
           type: Dynamic
         type: Values
       type: Boolean
@@ -1325,18 +1325,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'true'
-          type: Dynamic
-        type: Values
-      type: Boolean
-    USB_1_INTERRUPT_ENABLE:
-      attributes:
-        id: USB_1_INTERRUPT_ENABLE
-      children:
-      - children:
-        - attributes:
-            id: drv_usbfs_v1
-            value: 'true'
+            value: 'false'
           type: Dynamic
         type: Values
       type: Boolean
@@ -1347,18 +1336,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'true'
-          type: Dynamic
-        type: Values
-      type: Boolean
-    USB_1_INTERRUPT_HANDLER_LOCK:
-      attributes:
-        id: USB_1_INTERRUPT_HANDLER_LOCK
-      children:
-      - children:
-        - attributes:
-            id: drv_usbfs_v1
-            value: 'true'
+            value: 'false'
           type: Dynamic
         type: Values
       type: Boolean
@@ -1369,18 +1347,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: DRV_USBFS_USB_Handler
-          type: Dynamic
-        type: Values
-      type: String
-    USB_1_INTERRUPT_HANDLER:
-      attributes:
-        id: USB_1_INTERRUPT_HANDLER
-      children:
-      - children:
-        - attributes:
-            id: drv_usbfs_v1
-            value: DRV_USBFS_USB_Handler
+            value: USB_1_Handler
           type: Dynamic
         type: Values
       type: String
@@ -1391,21 +1358,10 @@ data:
       - children:
         - attributes:
             id: core
-            value: '131842'
+            value: '16974594'
           type: Dynamic
         type: Values
       type: Hex
-    USB_CLOCK_ENABLE:
-      attributes:
-        id: USB_CLOCK_ENABLE
-      children:
-      - children:
-        - attributes:
-            id: drv_usbfs_v1
-            value: 'true'
-          type: Dynamic
-        type: Values
-      type: Boolean
     UART1_CLOCK_ENABLE:
       attributes:
         id: UART1_CLOCK_ENABLE
@@ -1494,17 +1450,6 @@ data:
           type: Dynamic
         type: Values
       type: String
-    I2C1_CLOCK_ENABLE:
-      attributes:
-        id: I2C1_CLOCK_ENABLE
-      children:
-      - children:
-        - attributes:
-            id: i2c1
-            value: 'true'
-          type: Dynamic
-        type: Values
-      type: Boolean
     I2C_1_INTERRUPT_ENABLE_UPDATE:
       attributes:
         id: I2C_1_INTERRUPT_ENABLE_UPDATE
@@ -1512,7 +1457,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'false'
+            value: 'true'
           type: Dynamic
         type: Values
       type: Boolean
@@ -1523,18 +1468,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'true'
-          type: Dynamic
-        type: Values
-      type: Boolean
-    I2C_1_INTERRUPT_ENABLE:
-      attributes:
-        id: I2C_1_INTERRUPT_ENABLE
-      children:
-      - children:
-        - attributes:
-            id: i2c1
-            value: 'true'
+            value: 'false'
           type: Dynamic
         type: Values
       type: Boolean
@@ -1545,18 +1479,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'true'
-          type: Dynamic
-        type: Values
-      type: Boolean
-    I2C_1_INTERRUPT_HANDLER_LOCK:
-      attributes:
-        id: I2C_1_INTERRUPT_HANDLER_LOCK
-      children:
-      - children:
-        - attributes:
-            id: i2c1
-            value: 'true'
+            value: 'false'
           type: Dynamic
         type: Values
       type: Boolean
@@ -1567,18 +1490,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: I2C_1_InterruptHandler
-          type: Dynamic
-        type: Values
-      type: String
-    I2C_1_INTERRUPT_HANDLER:
-      attributes:
-        id: I2C_1_INTERRUPT_HANDLER
-      children:
-      - children:
-        - attributes:
-            id: i2c1
-            value: I2C_1_InterruptHandler
+            value: I2C_1_Handler
           type: Dynamic
         type: Values
       type: String

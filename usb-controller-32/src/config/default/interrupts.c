@@ -48,7 +48,6 @@
 // Section: Included Files
 // *****************************************************************************
 // *****************************************************************************
-#include "configuration.h"
 #include "interrupts.h"
 #include "definitions.h"
 
@@ -67,9 +66,7 @@
 // Section: System Interrupt Vector declarations
 // *****************************************************************************
 // *****************************************************************************
-void USB_1_Handler (void);
 void UART_1_Handler (void);
-void I2C_1_Handler (void);
 void CHANGE_NOTICE_Handler (void);
 
 
@@ -78,28 +75,15 @@ void CHANGE_NOTICE_Handler (void);
 // Section: System Interrupt Vector definitions
 // *****************************************************************************
 // *****************************************************************************
-
-
-void __attribute__((used)) USB_1_Handler (void)
-{
-    DRV_USBFS_USB_Handler();
-}
-
-void __attribute__((used)) UART_1_Handler (void)
+void __attribute__((used)) __ISR(_UART_1_VECTOR, ipl1SOFT) UART_1_Handler (void)
 {
     UART_1_InterruptHandler();
 }
 
-void __attribute__((used)) I2C_1_Handler (void)
-{
-    I2C_1_InterruptHandler();
-}
-
-void __attribute__((used)) CHANGE_NOTICE_Handler (void)
+void __attribute__((used)) __ISR(_CHANGE_NOTICE_VECTOR, ipl1SOFT) CHANGE_NOTICE_Handler (void)
 {
     CHANGE_NOTICE_InterruptHandler();
 }
-
 
 
 

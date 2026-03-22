@@ -9,26 +9,21 @@ Logger& Logger::getInstance() {
 }
 
 Logger::Logger()
-    : txComplete_(nullptr)
-    , mutex_(nullptr)
+    : txDone_(true)
     , initialized_(false)
 {
     buffer_[0] = '\0';
 }
 
 void Logger::txCallback(uintptr_t context) {
-    auto sem = reinterpret_cast<SemaphoreHandle_t>(context);
-    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-    xSemaphoreGiveFromISR(sem, &xHigherPriorityTaskWoken);
+    auto* flag = reinterpret_cast<volatile bool*>(context);
+    *flag = true;
 }
 
 void Logger::init() {
     if (initialized_) return;
 
-    txComplete_ = xSemaphoreCreateBinary();
-    mutex_ = xSemaphoreCreateMutex();
-
-    UART1_WriteCallbackRegister(txCallback, reinterpret_cast<uintptr_t>(txComplete_));
+    UART1_WriteCallbackRegister(txCallback, reinterpret_cast<uintptr_t>(&txDone_));
 
     initialized_ = true;
 }
@@ -36,7 +31,7 @@ void Logger::init() {
 void Logger::log(const char* message) {
     if (!initialized_) return;
 
-    xSemaphoreTake(mutex_, portMAX_DELAY);
+    while (!txDone_) {}
 
     size_t len = strlen(message);
     if (len > sizeof(buffer_) - 3) {
@@ -46,16 +41,14 @@ void Logger::log(const char* message) {
     buffer_[len] = '\r';
     buffer_[len + 1] = '\n';
 
+    txDone_ = false;
     UART1_Write(buffer_, len + 2);
-    xSemaphoreTake(txComplete_, portMAX_DELAY);
-
-    xSemaphoreGive(mutex_);
 }
 
 void Logger::log(const char* tag, const char* message) {
     if (!initialized_) return;
 
-    xSemaphoreTake(mutex_, portMAX_DELAY);
+    while (!txDone_) {}
 
     int len = snprintf(buffer_, sizeof(buffer_) - 2, "[%s] %s", tag, message);
     if (len < 0) len = 0;
@@ -63,16 +56,14 @@ void Logger::log(const char* tag, const char* message) {
     buffer_[len] = '\r';
     buffer_[len + 1] = '\n';
 
+    txDone_ = false;
     UART1_Write(buffer_, len + 2);
-    xSemaphoreTake(txComplete_, portMAX_DELAY);
-
-    xSemaphoreGive(mutex_);
 }
 
 void Logger::logf(const char* format, ...) {
     if (!initialized_) return;
 
-    xSemaphoreTake(mutex_, portMAX_DELAY);
+    while (!txDone_) {}
 
     va_list args;
     va_start(args, format);
@@ -84,8 +75,6 @@ void Logger::logf(const char* format, ...) {
     buffer_[len] = '\r';
     buffer_[len + 1] = '\n';
 
+    txDone_ = false;
     UART1_Write(buffer_, len + 2);
-    xSemaphoreTake(txComplete_, portMAX_DELAY);
-
-    xSemaphoreGive(mutex_);
 }

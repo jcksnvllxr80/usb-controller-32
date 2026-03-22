@@ -43,7 +43,6 @@
 // Section: Included Files
 // *****************************************************************************
 // *****************************************************************************
-#include "configuration.h"
 #include "definitions.h"
 #include "device.h"
 
@@ -113,51 +112,12 @@
 // Section: System Data
 // *****************************************************************************
 // *****************************************************************************
-/* Structure to hold the object handles for the modules in the system. */
-SYSTEM_OBJECTS sysObj;
 
 // *****************************************************************************
 // *****************************************************************************
 // Section: Library/Stack Initialization Data
 // *****************************************************************************
 // *****************************************************************************
-/******************************************************
- * USB Driver Initialization
- ******************************************************/
- 
-static uint8_t __attribute__((aligned(512))) endPointTable1[DRV_USBFS_ENDPOINTS_NUMBER * 32];
-
-
-static const DRV_USBFS_INIT drvUSBFSInit =
-{
-     /* Assign the endpoint table */
-    .endpointTable= endPointTable1,
-
-    /* Interrupt Source for USB module */
-    .interruptSource = INT_SOURCE_USB,
-    
-    /* USB Controller to operate as USB Device */
-    .operationMode = DRV_USBFS_OPMODE_DEVICE,
-    
-    .operationSpeed = USB_SPEED_FULL,
- 
-    /* Stop in idle */
-    .stopInIdle = false,
-    
-    /* Suspend in sleep */
-    .suspendInSleep = false,
- 
-    /* Identifies peripheral (PLIB-level) ID */
-    .usbID = USB_ID_1,
-    
-
-};
-
-
-
-
-
-
 
 
 // *****************************************************************************
@@ -209,28 +169,7 @@ void SYS_Initialize ( void* data )
 
 	GPIO_Initialize();
 
-    I2C1_Initialize();
 	UART1_Initialize();
-
-
-    /* MISRAC 2023 deviation block start */
-    /* Following MISRA-C rules deviated in this block  */
-    /* MISRA C-2023 Rule 11.3 - Deviation record ID - H3_MISRAC_2023_R_11_3_DR_1 */
-    /* MISRA C-2023 Rule 11.8 - Deviation record ID - H3_MISRAC_2023_R_11_8_DR_1 */
-
-
-
-    /* Initialize USB Driver */ 
-    sysObj.drvUSBFSObject = DRV_USBFS_Initialize(DRV_USBFS_INDEX_0, (SYS_MODULE_INIT *) &drvUSBFSInit);    
-
-
-    /* Initialize the USB device layer */
-    sysObj.usbDevObject0 = USB_DEVICE_Initialize (USB_DEVICE_INDEX_0 , ( SYS_MODULE_INIT* ) & usbDevInitData);
-
-
-
-    /* MISRAC 2023 deviation block end */
-    APP_Initialize();
 
 
     EVIC_Initialize();

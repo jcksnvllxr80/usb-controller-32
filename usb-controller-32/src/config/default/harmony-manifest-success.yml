@@ -4,7 +4,7 @@
 
 
 project: usb-controller-32_default
-creation_date: 2026-03-16T00:21:57.560-04:00[America/New_York]    # ISO 8601 format: https://www.w3.org/TR/NOTE-datetime
+creation_date: 2026-03-21T23:29:10.847-04:00[America/New_York]    # ISO 8601 format: https://www.w3.org/TR/NOTE-datetime
 operating_system: Windows 11
 mcc_mode: VSCodePlugin            # [IDE|Standalone|Headless]
 mcc_version: v5.6.4
@@ -15,9 +15,6 @@ compiler: NA
 
 modules:
     - {name: "csp", version: "v3.25.1"}
-    - {name: "core", version: "v3.16.1"}
-    - {name: "usb", version: "v3.16.0"}
-    - {name: "FreeRTOS-Kernel", version: "V11.2.0"}
 
 packs:
     - {name: "PIC32MX_DFP", version: "1.6.369"}
