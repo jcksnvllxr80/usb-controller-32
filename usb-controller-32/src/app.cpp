@@ -8,7 +8,8 @@ static volatile bool btn1Changed = false;
 static volatile bool btn1Pressed = false;
 static volatile bool btn2Changed = false;
 static volatile bool btn2Pressed = false;
-static volatile bool mcpIntFired = false;
+static volatile bool mcpIntAFired = false;
+static volatile bool mcpIntBFired = false;
 
 static void pinCallback(GPIO_PIN pin, uintptr_t context) {
     (void)context;
@@ -20,8 +21,10 @@ static void pinCallback(GPIO_PIN pin, uintptr_t context) {
         btn2Pressed = (BUTTON_2_Get() == 0);
         if (btn2Pressed) { RED_LED_Set(); } else { RED_LED_Clear(); }
         btn2Changed = true;
-    } else if (pin == INTERRUPT_A_PIN || pin == INTERRUPT_B_PIN) {
-        mcpIntFired = true;
+    } else if (pin == INTERRUPT_A_PIN) {
+        mcpIntAFired = true;
+    } else if (pin == INTERRUPT_B_PIN) {
+        mcpIntBFired = true;
     }
 }
 
@@ -53,8 +56,12 @@ extern "C" void APP_Tasks(void) {
         btn2Changed = false;
         Logger::getInstance().logf("[BTN2] %s", btn2Pressed ? "PRESSED" : "RELEASED");
     }
-    if (mcpIntFired) {
-        mcpIntFired = false;
-        mcp.handleInterrupts();
+    if (mcpIntAFired) {
+        mcpIntAFired = false;
+        mcp.handleInterruptA();
+    }
+    if (mcpIntBFired) {
+        mcpIntBFired = false;
+        mcp.handleInterruptB();
     }
 }

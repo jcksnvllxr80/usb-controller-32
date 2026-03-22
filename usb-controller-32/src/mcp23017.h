@@ -40,9 +40,8 @@ public:
     bool readPortA(uint8_t& value);
     bool readPortB(uint8_t& value);
 
-    // Poll interrupt pins and handle any pending MCP23017 interrupts.
-    // Returns true if an interrupt was serviced.
-    bool handleInterrupts();
+    bool handleInterruptA();
+    bool handleInterruptB();
 
 private:
     static void i2cCallback(uintptr_t context);
@@ -50,6 +49,8 @@ private:
 
     uint16_t address_;
     volatile bool i2cDone_;
+    uint8_t bankA_;
+    uint8_t bankB_;
     uint8_t txBuf_[2];
     uint8_t rxBuf_[1];
 };
