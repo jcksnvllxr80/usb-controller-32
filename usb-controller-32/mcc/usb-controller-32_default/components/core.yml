@@ -1831,6 +1831,632 @@ data:
           type: User
         type: Values
       type: Combo
+    BSP_PIN_1_PORT_PIN:
+      attributes:
+        id: BSP_PIN_1_PORT_PIN
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: '-1'
+          type: Dynamic
+        type: Values
+      type: Integer
+    BSP_PIN_1_PORT_CHANNEL:
+      attributes:
+        id: BSP_PIN_1_PORT_CHANNEL
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: ''
+          type: Dynamic
+        type: Values
+      type: String
+    BSP_PIN_2_PORT_PIN:
+      attributes:
+        id: BSP_PIN_2_PORT_PIN
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: '0'
+          type: Dynamic
+        type: Values
+      type: Integer
+    BSP_PIN_2_PORT_CHANNEL:
+      attributes:
+        id: BSP_PIN_2_PORT_CHANNEL
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: A
+          type: Dynamic
+        type: Values
+      type: String
+    BSP_PIN_3_PORT_PIN:
+      attributes:
+        id: BSP_PIN_3_PORT_PIN
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: '1'
+          type: Dynamic
+        type: Values
+      type: Integer
+    BSP_PIN_3_PORT_CHANNEL:
+      attributes:
+        id: BSP_PIN_3_PORT_CHANNEL
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: A
+          type: Dynamic
+        type: Values
+      type: String
+    BSP_PIN_4_PORT_PIN:
+      attributes:
+        id: BSP_PIN_4_PORT_PIN
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: '0'
+          type: Dynamic
+        type: Values
+      type: Integer
+    BSP_PIN_4_PORT_CHANNEL:
+      attributes:
+        id: BSP_PIN_4_PORT_CHANNEL
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: B
+          type: Dynamic
+        type: Values
+      type: String
+    BSP_PIN_5_PORT_PIN:
+      attributes:
+        id: BSP_PIN_5_PORT_PIN
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: '1'
+          type: Dynamic
+        type: Values
+      type: Integer
+    BSP_PIN_5_PORT_CHANNEL:
+      attributes:
+        id: BSP_PIN_5_PORT_CHANNEL
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: B
+          type: Dynamic
+        type: Values
+      type: String
+    BSP_PIN_6_PORT_PIN:
+      attributes:
+        id: BSP_PIN_6_PORT_PIN
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: '2'
+          type: Dynamic
+        type: Values
+      type: Integer
+    BSP_PIN_6_PORT_CHANNEL:
+      attributes:
+        id: BSP_PIN_6_PORT_CHANNEL
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: B
+          type: Dynamic
+        type: Values
+      type: String
+    BSP_PIN_7_PORT_PIN:
+      attributes:
+        id: BSP_PIN_7_PORT_PIN
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: '3'
+          type: Dynamic
+        type: Values
+      type: Integer
+    BSP_PIN_7_PORT_CHANNEL:
+      attributes:
+        id: BSP_PIN_7_PORT_CHANNEL
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: B
+          type: Dynamic
+        type: Values
+      type: String
+    BSP_PIN_8_PORT_PIN:
+      attributes:
+        id: BSP_PIN_8_PORT_PIN
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: '-1'
+          type: Dynamic
+        type: Values
+      type: Integer
+    BSP_PIN_8_PORT_CHANNEL:
+      attributes:
+        id: BSP_PIN_8_PORT_CHANNEL
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: ''
+          type: Dynamic
+        type: Values
+      type: String
+    BSP_PIN_9_PORT_PIN:
+      attributes:
+        id: BSP_PIN_9_PORT_PIN
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: '2'
+          type: Dynamic
+        type: Values
+      type: Integer
+    BSP_PIN_9_PORT_CHANNEL:
+      attributes:
+        id: BSP_PIN_9_PORT_CHANNEL
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: A
+          type: Dynamic
+        type: Values
+      type: String
+    BSP_PIN_10_PORT_PIN:
+      attributes:
+        id: BSP_PIN_10_PORT_PIN
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: '3'
+          type: Dynamic
+        type: Values
+      type: Integer
+    BSP_PIN_10_PORT_CHANNEL:
+      attributes:
+        id: BSP_PIN_10_PORT_CHANNEL
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: A
+          type: Dynamic
+        type: Values
+      type: String
+    BSP_PIN_11_PORT_PIN:
+      attributes:
+        id: BSP_PIN_11_PORT_PIN
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: '4'
+          type: Dynamic
+        type: Values
+      type: Integer
+    BSP_PIN_11_PORT_CHANNEL:
+      attributes:
+        id: BSP_PIN_11_PORT_CHANNEL
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: B
+          type: Dynamic
+        type: Values
+      type: String
+    BSP_PIN_12_PORT_PIN:
+      attributes:
+        id: BSP_PIN_12_PORT_PIN
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: '4'
+          type: Dynamic
+        type: Values
+      type: Integer
+    BSP_PIN_12_PORT_CHANNEL:
+      attributes:
+        id: BSP_PIN_12_PORT_CHANNEL
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: A
+          type: Dynamic
+        type: Values
+      type: String
+    BSP_PIN_13_PORT_PIN:
+      attributes:
+        id: BSP_PIN_13_PORT_PIN
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: '-1'
+          type: Dynamic
+        type: Values
+      type: Integer
+    BSP_PIN_13_PORT_CHANNEL:
+      attributes:
+        id: BSP_PIN_13_PORT_CHANNEL
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: ''
+          type: Dynamic
+        type: Values
+      type: String
+    BSP_PIN_14_PORT_PIN:
+      attributes:
+        id: BSP_PIN_14_PORT_PIN
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: '5'
+          type: Dynamic
+        type: Values
+      type: Integer
+    BSP_PIN_14_PORT_CHANNEL:
+      attributes:
+        id: BSP_PIN_14_PORT_CHANNEL
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: B
+          type: Dynamic
+        type: Values
+      type: String
+    BSP_PIN_15_PORT_PIN:
+      attributes:
+        id: BSP_PIN_15_PORT_PIN
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: '-1'
+          type: Dynamic
+        type: Values
+      type: Integer
+    BSP_PIN_15_PORT_CHANNEL:
+      attributes:
+        id: BSP_PIN_15_PORT_CHANNEL
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: ''
+          type: Dynamic
+        type: Values
+      type: String
+    BSP_PIN_16_PORT_PIN:
+      attributes:
+        id: BSP_PIN_16_PORT_PIN
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: '7'
+          type: Dynamic
+        type: Values
+      type: Integer
+    BSP_PIN_16_PORT_CHANNEL:
+      attributes:
+        id: BSP_PIN_16_PORT_CHANNEL
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: B
+          type: Dynamic
+        type: Values
+      type: String
+    BSP_PIN_17_PORT_PIN:
+      attributes:
+        id: BSP_PIN_17_PORT_PIN
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: '8'
+          type: Dynamic
+        type: Values
+      type: Integer
+    BSP_PIN_17_PORT_CHANNEL:
+      attributes:
+        id: BSP_PIN_17_PORT_CHANNEL
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: B
+          type: Dynamic
+        type: Values
+      type: String
+    BSP_PIN_18_PORT_PIN:
+      attributes:
+        id: BSP_PIN_18_PORT_PIN
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: '9'
+          type: Dynamic
+        type: Values
+      type: Integer
+    BSP_PIN_18_PORT_CHANNEL:
+      attributes:
+        id: BSP_PIN_18_PORT_CHANNEL
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: B
+          type: Dynamic
+        type: Values
+      type: String
+    BSP_PIN_19_PORT_PIN:
+      attributes:
+        id: BSP_PIN_19_PORT_PIN
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: '-1'
+          type: Dynamic
+        type: Values
+      type: Integer
+    BSP_PIN_19_PORT_CHANNEL:
+      attributes:
+        id: BSP_PIN_19_PORT_CHANNEL
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: ''
+          type: Dynamic
+        type: Values
+      type: String
+    BSP_PIN_20_PORT_PIN:
+      attributes:
+        id: BSP_PIN_20_PORT_PIN
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: '-1'
+          type: Dynamic
+        type: Values
+      type: Integer
+    BSP_PIN_20_PORT_CHANNEL:
+      attributes:
+        id: BSP_PIN_20_PORT_CHANNEL
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: ''
+          type: Dynamic
+        type: Values
+      type: String
+    BSP_PIN_21_PORT_PIN:
+      attributes:
+        id: BSP_PIN_21_PORT_PIN
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: '10'
+          type: Dynamic
+        type: Values
+      type: Integer
+    BSP_PIN_21_PORT_CHANNEL:
+      attributes:
+        id: BSP_PIN_21_PORT_CHANNEL
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: B
+          type: Dynamic
+        type: Values
+      type: String
+    BSP_PIN_22_PORT_PIN:
+      attributes:
+        id: BSP_PIN_22_PORT_PIN
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: '11'
+          type: Dynamic
+        type: Values
+      type: Integer
+    BSP_PIN_22_PORT_CHANNEL:
+      attributes:
+        id: BSP_PIN_22_PORT_CHANNEL
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: B
+          type: Dynamic
+        type: Values
+      type: String
+    BSP_PIN_23_PORT_PIN:
+      attributes:
+        id: BSP_PIN_23_PORT_PIN
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: '-1'
+          type: Dynamic
+        type: Values
+      type: Integer
+    BSP_PIN_23_PORT_CHANNEL:
+      attributes:
+        id: BSP_PIN_23_PORT_CHANNEL
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: ''
+          type: Dynamic
+        type: Values
+      type: String
+    BSP_PIN_24_PORT_PIN:
+      attributes:
+        id: BSP_PIN_24_PORT_PIN
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: '13'
+          type: Dynamic
+        type: Values
+      type: Integer
+    BSP_PIN_24_PORT_CHANNEL:
+      attributes:
+        id: BSP_PIN_24_PORT_CHANNEL
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: B
+          type: Dynamic
+        type: Values
+      type: String
+    BSP_PIN_25_PORT_PIN:
+      attributes:
+        id: BSP_PIN_25_PORT_PIN
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: '14'
+          type: Dynamic
+        type: Values
+      type: Integer
+    BSP_PIN_25_PORT_CHANNEL:
+      attributes:
+        id: BSP_PIN_25_PORT_CHANNEL
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: B
+          type: Dynamic
+        type: Values
+      type: String
+    BSP_PIN_26_PORT_PIN:
+      attributes:
+        id: BSP_PIN_26_PORT_PIN
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: '15'
+          type: Dynamic
+        type: Values
+      type: Integer
+    BSP_PIN_26_PORT_CHANNEL:
+      attributes:
+        id: BSP_PIN_26_PORT_CHANNEL
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: B
+          type: Dynamic
+        type: Values
+      type: String
+    BSP_PIN_27_PORT_PIN:
+      attributes:
+        id: BSP_PIN_27_PORT_PIN
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: '-1'
+          type: Dynamic
+        type: Values
+      type: Integer
+    BSP_PIN_27_PORT_CHANNEL:
+      attributes:
+        id: BSP_PIN_27_PORT_CHANNEL
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: ''
+          type: Dynamic
+        type: Values
+      type: String
+    BSP_PIN_28_PORT_PIN:
+      attributes:
+        id: BSP_PIN_28_PORT_PIN
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: '-1'
+          type: Dynamic
+        type: Values
+      type: Integer
+    BSP_PIN_28_PORT_CHANNEL:
+      attributes:
+        id: BSP_PIN_28_PORT_CHANNEL
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: ''
+          type: Dynamic
+        type: Values
+      type: String
+    COMPONENT_PACKAGE:
+      attributes:
+        id: COMPONENT_PACKAGE
+      children:
+      - children:
+        - attributes:
+            value: SPDIP
+          type: User
+        type: Values
+      type: Combo
   userData:
     children:
     - attributes:
