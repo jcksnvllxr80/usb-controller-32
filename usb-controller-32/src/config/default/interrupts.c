@@ -67,6 +67,7 @@
 // *****************************************************************************
 // *****************************************************************************
 void UART_1_Handler (void);
+void I2C_1_Handler (void);
 void CHANGE_NOTICE_Handler (void);
 
 
@@ -78,6 +79,11 @@ void CHANGE_NOTICE_Handler (void);
 void __attribute__((used)) __ISR(_UART_1_VECTOR, ipl1SOFT) UART_1_Handler (void)
 {
     UART_1_InterruptHandler();
+}
+
+void __attribute__((used)) __ISR(_I2C_1_VECTOR, ipl1SOFT) I2C_1_Handler (void)
+{
+    I2C_1_InterruptHandler();
 }
 
 void __attribute__((used)) __ISR(_CHANGE_NOTICE_VECTOR, ipl1SOFT) CHANGE_NOTICE_Handler (void)

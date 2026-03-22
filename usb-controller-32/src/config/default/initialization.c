@@ -169,6 +169,7 @@ void SYS_Initialize ( void* data )
 
 	GPIO_Initialize();
 
+    I2C1_Initialize();
 	UART1_Initialize();
 
 
