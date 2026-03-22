@@ -64,7 +64,7 @@
 
 
 /*** DEVCFG1 ***/
-#pragma config FNOSC =      FRCPLL
+#pragma config FNOSC =      PRIPLL
 #pragma config FPBDIV =     DIV_1
 #pragma config FSOSCEN =    OFF
 #pragma config IESO =       OFF
@@ -78,7 +78,7 @@
 
 
 /*** DEVCFG2 ***/
-#pragma config FPLLIDIV =   DIV_2
+#pragma config FPLLIDIV =   DIV_5
 #pragma config FPLLMUL =    MUL_24
 #pragma config FPLLODIV =   DIV_2
 #pragma config UPLLEN =     OFF

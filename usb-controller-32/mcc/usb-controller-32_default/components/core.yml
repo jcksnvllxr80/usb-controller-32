@@ -1811,6 +1811,26 @@ data:
           type: User
         type: Values
       type: String
+    CONFIG_FNOSC:
+      attributes:
+        id: CONFIG_FNOSC
+      children:
+      - children:
+        - attributes:
+            value: PRIPLL
+          type: User
+        type: Values
+      type: Combo
+    CONFIG_FPLLIDIV:
+      attributes:
+        id: CONFIG_FPLLIDIV
+      children:
+      - children:
+        - attributes:
+            value: DIV_5
+          type: User
+        type: Values
+      type: Combo
   userData:
     children:
     - attributes:

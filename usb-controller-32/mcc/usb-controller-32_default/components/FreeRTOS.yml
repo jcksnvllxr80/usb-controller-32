@@ -43,4 +43,15 @@ data:
           type: Dynamic
         type: Values
       type: String
+    FREERTOS_PERIPHERAL_CLOCK_HZ:
+      attributes:
+        id: FREERTOS_PERIPHERAL_CLOCK_HZ
+      children:
+      - children:
+        - attributes:
+            id: FreeRTOS
+            value: '48000000'
+          type: Dynamic
+        type: Values
+      type: Integer
   userData: {}
