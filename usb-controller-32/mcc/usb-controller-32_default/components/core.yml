@@ -2369,6 +2369,37 @@ data:
           type: User
         type: Values
       type: Combo
+    SYS_PORT_B_CNPU:
+      attributes:
+        id: SYS_PORT_B_CNPU
+      children:
+      - children:
+        - attributes:
+            id: core
+            value: '49152'
+          type: Dynamic
+        type: Values
+      type: Hex
+    BSP_PIN_25_PU:
+      attributes:
+        id: BSP_PIN_25_PU
+      children:
+      - children:
+        - attributes:
+            value: 'True'
+          type: User
+        type: Values
+      type: String
+    BSP_PIN_26_PU:
+      attributes:
+        id: BSP_PIN_26_PU
+      children:
+      - children:
+        - attributes:
+            value: 'True'
+          type: User
+        type: Values
+      type: String
   userData:
     children:
     - attributes:
