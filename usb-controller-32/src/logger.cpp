@@ -40,9 +40,12 @@ void Logger::log(const char* message) {
     memcpy(buffer_, message, len);
     buffer_[len] = '\r';
     buffer_[len + 1] = '\n';
+    buffer_[len + 2] = '\0';
 
     txDone_ = false;
-    UART1_Write(buffer_, len + 2);
+    if (!UART1_Write(buffer_, len + 2)) {
+        txDone_ = true;
+    }
 }
 
 void Logger::log(const char* tag, const char* message) {
@@ -57,7 +60,9 @@ void Logger::log(const char* tag, const char* message) {
     buffer_[len + 1] = '\n';
 
     txDone_ = false;
-    UART1_Write(buffer_, len + 2);
+    if (!UART1_Write(buffer_, len + 2)) {
+        txDone_ = true;
+    }
 }
 
 void Logger::logf(const char* format, ...) {
@@ -76,5 +81,7 @@ void Logger::logf(const char* format, ...) {
     buffer_[len + 1] = '\n';
 
     txDone_ = false;
-    UART1_Write(buffer_, len + 2);
+    if (!UART1_Write(buffer_, len + 2)) {
+        txDone_ = true;
+    }
 }
