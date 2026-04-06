@@ -7,6 +7,7 @@ groupModules: []
 modules:
 - core
 - dfp
+- i2c1
 - uart1
 generatedFileHashHistoryMap:
 - file: ..\src\config\default\definitions.h
