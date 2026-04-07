@@ -6,10 +6,11 @@ A USB HID gamepad controller built on the **PIC32MX250F128B** microcontroller. T
 
 ## Features
 
-- USB HID gamepad with up to 18 button inputs (2 direct GPIO + 16 via MCP23017)
+- USB HID gamepad with 18 button inputs (2 direct GPIO + 16 via MCP23017)
+- 8-byte HID input report with 18 buttons, hat switch, and centered axes
 - MCP23017 I2C I/O expander with interrupt-driven input detection
 - FreeRTOS-based task scheduling
-- UART debug logging
+- UART debug logging and USB/HID diagnostics
 - Green and red status LEDs
 
 ## Architecture
@@ -58,7 +59,7 @@ A USB HID gamepad controller built on the **PIC32MX250F128B** microcontroller. T
 | Button inputs (direct) | 2 | PIC32 GPIO | RB14, RB15 |
 | Button inputs (expanded) | 16 | MCP23017 Port A & B | GPA0–7, GPB0–7 |
 | LED outputs | 2 | PIC32 GPIO | Green (RB0), Red (RB1) |
-| USB HID | 1 | USB peripheral | 16-bit button report |
+| USB HID | 1 | USB peripheral | 18 buttons in an 8-byte report |
 | Debug UART | 1 | UART1 | 115200 baud (TX: RB4, RX: RB2) |
 | I2C bus | 1 | I2C1 | MCP23017 at 0x20 |
 
@@ -105,7 +106,29 @@ cd usb-controller-32
 
 1. After programming, the device should enumerate as a USB HID gamepad on the host PC.
 2. Open **Set up USB game controllers** (Windows) or a gamepad tester to confirm button presses are registered.
-3. Connect a serial terminal (115200 baud, 8N1) to the UART TX pin (RB4) to view debug logs.
+3. Connect a serial terminal (115200 baud, 8N1) to UART1 to view debug logs and issue commands.
+
+## UART Diagnostics
+
+Helper scripts:
+
+- `powershell -ExecutionPolicy Bypass -File .\tools\uart_query.ps1`
+- `powershell -ExecutionPolicy Bypass -File .\tools\uart_cmd.ps1 -cmd "status"`
+
+Useful commands:
+
+- `status` - GPIO, USB, and LED summary
+- `usb` - USB device state and register dump
+- `enum` - enumeration counters and last setup request
+- `hid` - HID readiness, send counters, and current report bytes
+- `usblog` - recent USB transaction log
+- `usbdbg` - toggle live USB debug logging
+- `usbreset` - soft detach/reattach to force re-enumeration
+
+## Firmware Notes
+
+- GPIO and MCP23017 interrupts only latch state. HID reports are built and sent from `APP_Tasks()`.
+- HID reports are only queued when input state changes, which keeps traffic and debug noise down.
 
 ## Project Structure
 
@@ -113,14 +136,17 @@ cd usb-controller-32
 usb-controller-32/
 ├── cmake/                      # CMake build configurations
 ├── docs/                       # Datasheets, block diagram, images
+├── tools/                      # Flash and UART helper scripts
 ├── usb-controller-32/
 │   ├── mcc/                    # MPLAB Code Configurator files
 │   └── src/
 │       ├── main.cpp            # Entry point (SYS_Initialize + SYS_Tasks)
-│       ├── app.cpp / app.h     # Application state machine
+│       ├── app.cpp / app.h     # App task, GPIO/MCP state, USB HID send path
+│       ├── command_handler.cpp / .h # UART command parser and diagnostics
 │       ├── gamepad.cpp / .h    # USB HID gamepad driver
 │       ├── mcp23017.cpp / .h   # MCP23017 I2C I/O expander driver
 │       ├── logger.cpp / .h     # UART debug logger (singleton)
+│       ├── usb_debug.c / .h    # USB debug logging helpers
 │       ├── config/             # Harmony-generated peripheral config
 │       └── third_party/rtos/   # FreeRTOS source
 └── README.md
@@ -129,4 +155,3 @@ usb-controller-32/
 ## License
 
 See Microchip's license terms in the source file headers.
-
