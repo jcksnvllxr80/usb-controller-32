@@ -100,6 +100,8 @@ bool MCP23017::init() {
     uint8_t dummy;
     (void)readRegister(GPIOA, dummy);
     (void)readRegister(GPIOB, dummy);
+    bankA_ = 0;
+    bankB_ = 0;
 
     Logger::getInstance().log("MCP23017", "Initialized successfully");
     return true;
@@ -122,11 +124,9 @@ bool MCP23017::handleInterruptA() {
         if (capture & (1u << 0)) {
             bankA_ |= (1u << 0);
             logger.log("MCP23017", "Port A pin 0 HIGH");
-            GREEN_LED_Set();
         } else {
             bankA_ &= ~(1u << 0);
             logger.log("MCP23017", "Port A pin 0 LOW");
-            GREEN_LED_Clear();
         }
     }
     // Pin 1
@@ -165,6 +165,7 @@ bool MCP23017::handleInterruptA() {
         else                     { bankA_ &= ~(1u << 7); logger.log("MCP23017", "Port A pin 7 LOW");  /* TODO */ }
     }
 
+    if (bankA_ != 0u) { GREEN_LED_Set(); } else { GREEN_LED_Clear(); }
     return true;
 }
 
@@ -182,8 +183,14 @@ bool MCP23017::handleInterruptB() {
 
     // Pin 0
     if (flags & (1u << 0)) {
-        if (capture & (1u << 0)) { bankB_ |= (1u << 0);  logger.log("MCP23017", "Port B pin 0 HIGH"); /* TODO */ }
-        else                     { bankB_ &= ~(1u << 0); logger.log("MCP23017", "Port B pin 0 LOW");  /* TODO */ }
+        if (capture & (1u << 0)) {
+            bankB_ |= (1u << 0);
+            logger.log("MCP23017", "Port B pin 0 HIGH");
+        }
+        else {
+            bankB_ &= ~(1u << 0);
+            logger.log("MCP23017", "Port B pin 0 LOW");
+        }
     }
     // Pin 1
     if (flags & (1u << 1)) {
@@ -221,5 +228,6 @@ bool MCP23017::handleInterruptB() {
         else                     { bankB_ &= ~(1u << 7); logger.log("MCP23017", "Port B pin 7 LOW");  /* TODO */ }
     }
 
+    if (bankB_ != 0u) { RED_LED_Set(); } else { RED_LED_Clear(); }
     return true;
 }
