@@ -249,8 +249,8 @@ void CommandHandler::processCommand() {
         if (usbDevHandle != USB_DEVICE_HANDLE_INVALID) {
             log.log("[USBRESET] Detaching...");
             USB_DEVICE_Detach(usbDevHandle);
-            /* Brief delay to let host notice disconnect */
-            for (volatile int i = 0; i < 500000; i++) {}
+            /* Hold the disconnect long enough for the host to de-enumerate. */
+            vTaskDelay(pdMS_TO_TICKS(250));
             log.log("[USBRESET] Re-attaching...");
             USB_DEVICE_Attach(usbDevHandle);
             log.log("[USBRESET] Done. Watch for re-enumeration.");

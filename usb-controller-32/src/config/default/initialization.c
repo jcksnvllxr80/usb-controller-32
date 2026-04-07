@@ -47,6 +47,29 @@
 #include "definitions.h"
 #include "device.h"
 
+static void USB_StartDetached(void)
+{
+    /* On warm resets Windows may not see a physical disconnect unless the USB
+     * pull-up is dropped long enough for the host to de-enumerate the device.
+     * Force the module fully off before the Harmony driver is initialized. */
+    IEC1CLR = _IEC1_USBIE_MASK;
+    IFS1CLR = _IFS1_USBIF_MASK;
+
+    U1OTGCONCLR = _U1OTGCON_DPPULUP_MASK | _U1OTGCON_DMPULUP_MASK;
+    U1CON = 0;
+    U1PWRC = 0;
+    U1IR = 0;
+    U1EIR = 0;
+    U1OTGIR = 0;
+
+    /* ~150 ms disconnect window gives the host enough time to drop the old
+     * device instance before we come back up. */
+    for (volatile uint32_t i = 0; i < 1200000UL; i++)
+    {
+        __asm__ volatile("nop");
+    }
+}
+
 
 // ****************************************************************************
 // ****************************************************************************
@@ -211,6 +234,8 @@ void SYS_Initialize ( void* data )
 
     I2C1_Initialize();
 	UART1_Initialize();
+
+    USB_StartDetached();
 
 
     /* MISRAC 2023 deviation block start */

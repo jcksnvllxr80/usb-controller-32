@@ -21,6 +21,9 @@ static volatile bool btn2Pressed = false;
 static volatile bool mcpIntAFired = false;
 static volatile bool mcpIntBFired = false;
 static bool hidHandlerRegistered = false;
+static bool usbAttachPending = false;
+static TickType_t usbAttachStartTick = 0;
+static const TickType_t kUsbAttachDelayTicks = pdMS_TO_TICKS(250);
 
 /* ---- HID gamepad report ---- */
 USB_DEVICE_HID_TRANSFER_HANDLE hidTxHandle = USB_DEVICE_HID_TRANSFER_HANDLE_INVALID;
@@ -230,8 +233,18 @@ extern "C" void APP_Tasks(void) {
             USB_DEVICE_EventHandlerSet(usbDevHandle, usbDeviceEventCallback, 0);
             hidHandlerRegistered =
                 (USB_DEVICE_HID_EventHandlerSet(USB_DEVICE_HID_INDEX_0, hidEventCallback, 0) == USB_DEVICE_HID_RESULT_OK);
+            usbAttachStartTick = xTaskGetTickCount();
+            usbAttachPending = true;
+            Logger::getInstance().log("APP", "USB device opened; delaying attach for host re-detect");
+        }
+    }
+
+    if ((usbDevHandle != USB_DEVICE_HANDLE_INVALID) && usbAttachPending) {
+        TickType_t elapsed = xTaskGetTickCount() - usbAttachStartTick;
+        if (elapsed >= kUsbAttachDelayTicks) {
             USB_DEVICE_Attach(usbDevHandle);
-            Logger::getInstance().log("APP", "USB device opened and attached");
+            usbAttachPending = false;
+            Logger::getInstance().log("APP", "USB attached");
         }
     }
 
