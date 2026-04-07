@@ -1,4 +1,4 @@
 device PIC32MX250F128B
 hwtool PK5
-program "C:/Users/A-A-Ron/Desktop/usb-controller-32/out/usb-controller-32/usb-controller-32.hex"
+program "C:/Users/A-A-Ron/git/usb-controller-32/out/usb-controller-32/usb-controller-32.hex"
 quit

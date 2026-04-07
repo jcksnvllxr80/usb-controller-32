@@ -24,6 +24,9 @@ static bool hidHandlerRegistered = false;
 static bool usbAttachPending = false;
 static TickType_t usbAttachStartTick = 0;
 static const TickType_t kUsbAttachDelayTicks = pdMS_TO_TICKS(250);
+static const TickType_t kHidStartupQuietTicks = pdMS_TO_TICKS(1000);
+static volatile bool hidHostReady = false;
+static volatile TickType_t usbConfiguredTick = 0;
 
 /* ---- HID gamepad report ---- */
 USB_DEVICE_HID_TRANSFER_HANDLE hidTxHandle = USB_DEVICE_HID_TRANSFER_HANDLE_INVALID;
@@ -36,7 +39,7 @@ static volatile bool hidReportDirty = true;
 static bool hidReportSynced = false;
 static uint8_t hidIdleRate = 0;
 static uint8_t hidActiveProtocol = 1;
-static uint8_t hidControlReport[64];
+static constexpr uint8_t kDefaultHidReportId = 0;
 
 /* 8-byte gamepad report matching hid_rpt0 descriptor:
  *   [0]    buttons 1-8   (bits 0-7)
@@ -97,39 +100,46 @@ static USB_DEVICE_HID_EVENT_RESPONSE hidEventCallback(
             break;
         case USB_DEVICE_HID_EVENT_SET_IDLE: {
             auto* data = static_cast<USB_DEVICE_HID_EVENT_DATA_SET_IDLE*>(eventData);
+            hidHostReady = true;
             hidIdleRate = data->duration;
             USB_DEVICE_ControlStatus(usbDevHandle, USB_DEVICE_CONTROL_STATUS_OK);
             break;
         }
         case USB_DEVICE_HID_EVENT_GET_IDLE:
+            hidHostReady = true;
             USB_DEVICE_ControlSend(usbDevHandle, &hidIdleRate, 1);
             break;
         case USB_DEVICE_HID_EVENT_SET_PROTOCOL: {
             auto* data = static_cast<USB_DEVICE_HID_EVENT_DATA_SET_PROTOCOL*>(eventData);
+            hidHostReady = true;
             hidActiveProtocol = (uint8_t)data->protocolCode;
             USB_DEVICE_ControlStatus(usbDevHandle, USB_DEVICE_CONTROL_STATUS_OK);
             break;
         }
         case USB_DEVICE_HID_EVENT_GET_PROTOCOL:
+            hidHostReady = true;
             USB_DEVICE_ControlSend(usbDevHandle, &hidActiveProtocol, 1);
             break;
         case USB_DEVICE_HID_EVENT_GET_REPORT: {
             auto* data = static_cast<USB_DEVICE_HID_EVENT_DATA_GET_REPORT*>(eventData);
-            const size_t length = (data->reportLength < sizeof(gamepadReport))
-                ? data->reportLength
-                : sizeof(gamepadReport);
-            USB_DEVICE_ControlSend(usbDevHandle, gamepadReport, length);
+            hidHostReady = true;
+            if ((data->reportType == USB_HID_REPORT_TYPE_INPUT) &&
+                (data->reportID == kDefaultHidReportId)) {
+                buildGamepadReport(gamepadReport);
+                const size_t length = (data->reportLength < sizeof(gamepadReport))
+                    ? data->reportLength
+                    : sizeof(gamepadReport);
+                USB_DEVICE_ControlSend(usbDevHandle, gamepadReport, length);
+            } else {
+                USB_DEVICE_ControlStatus(usbDevHandle, USB_DEVICE_CONTROL_STATUS_ERROR);
+            }
             break;
         }
         case USB_DEVICE_HID_EVENT_SET_REPORT: {
             auto* data = static_cast<USB_DEVICE_HID_EVENT_DATA_SET_REPORT*>(eventData);
-            if (data->reportLength == 0) {
-                USB_DEVICE_ControlStatus(usbDevHandle, USB_DEVICE_CONTROL_STATUS_OK);
-            } else if (data->reportLength <= sizeof(hidControlReport)) {
-                USB_DEVICE_ControlReceive(usbDevHandle, hidControlReport, data->reportLength);
-            } else {
-                USB_DEVICE_ControlStatus(usbDevHandle, USB_DEVICE_CONTROL_STATUS_ERROR);
-            }
+            hidHostReady = true;
+            (void)data;
+            USB_DEVICE_ControlStatus(usbDevHandle, USB_DEVICE_CONTROL_STATUS_ERROR);
             break;
         }
         case USB_DEVICE_HID_EVENT_CONTROL_TRANSFER_DATA_RECEIVED:
@@ -154,6 +164,8 @@ static USB_DEVICE_EVENT_RESPONSE usbDeviceEventCallback(
         case USB_DEVICE_EVENT_CONFIGURED: {
             auto* configured = static_cast<USB_DEVICE_EVENT_DATA_CONFIGURED*>(eventData);
             usbConfigured = (configured != nullptr) && (configured->configurationValue == 1u);
+            usbConfiguredTick = xTaskGetTickCountFromISR();
+            hidHostReady = false;
             hidReady = usbConfigured && hidHandlerRegistered;
             hidTxBusy = false;
             hidTxHandle = USB_DEVICE_HID_TRANSFER_HANDLE_INVALID;
@@ -166,6 +178,8 @@ static USB_DEVICE_EVENT_RESPONSE usbDeviceEventCallback(
         case USB_DEVICE_EVENT_DECONFIGURED:
         case USB_DEVICE_EVENT_POWER_REMOVED:
             usbConfigured = false;
+            hidHostReady = false;
+            usbConfiguredTick = 0;
             hidReady = false;
             hidTxBusy = false;
             hidTxHandle = USB_DEVICE_HID_TRANSFER_HANDLE_INVALID;
@@ -275,7 +289,10 @@ extern "C" void APP_Tasks(void) {
     }
 
     /* ---- Build and send HID gamepad report ---- */
-    if (hidReady && !hidTxBusy && hidReportDirty) {
+    const bool hidStartupQuietComplete =
+        hidReady && ((xTaskGetTickCount() - usbConfiguredTick) >= kHidStartupQuietTicks);
+
+    if (hidReady && (hidHostReady || hidStartupQuietComplete) && !hidTxBusy && hidReportDirty) {
         uint8_t nextReport[sizeof(gamepadReport)];
         buildGamepadReport(nextReport);
 

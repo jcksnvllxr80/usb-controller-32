@@ -99,7 +99,7 @@ static const USB_DEVICE_HID_INIT hidInit0 =
 {
      .hidReportDescriptorSize = sizeof(hid_rpt0),
      .hidReportDescriptor = (void *)&hid_rpt0,
-     .queueSizeReportReceive = 1,
+     .queueSizeReportReceive = 0,
      .queueSizeReportSend = 1
 };
 
@@ -151,7 +151,7 @@ static const USB_DEVICE_DESCRIPTOR usbDeviceDescriptor =
     0x0100,                                                 // Device release number in BCD format
     0x01,                                                   // Manufacturer string index
     0x02,                                                   // Product string index
-    0x03,                                                   // Device serial number string index
+    0x00,                                                   // Device serial number string index
     0x01                                                    // Number of possible configurations
 };
 
@@ -166,7 +166,7 @@ static const uint8_t fullSpeedConfigurationDescriptor[]=
 
     0x09,                                                   // Size of this descriptor in bytes
     (uint8_t)USB_DESCRIPTOR_CONFIGURATION,                           // Descriptor Type
-    USB_DEVICE_16bitTo8bitArrange(41),                      //(41 Bytes)Size of the Configuration descriptor
+    USB_DEVICE_16bitTo8bitArrange(34),                      //(34 Bytes)Size of the Configuration descriptor
     1,                                                      // Number of interfaces in this configuration
     0x01,                                                   // Index value of this configuration
     0x00,                                                   // Configuration string index
@@ -179,7 +179,7 @@ static const uint8_t fullSpeedConfigurationDescriptor[]=
     USB_DESCRIPTOR_INTERFACE,           // Descriptor Type is Interface descriptor
     0,                                  // Interface Number
     0x00,                                  // Alternate Setting Number
-    0x02,                                  // Number of endpoints in this interface
+    0x01,                                  // Number of endpoints in this interface
     USB_HID_CLASS_CODE,                 // Class code
     (uint8_t)USB_HID_SUBCLASS_CODE_NO_SUBCLASS , // Subclass code
     (uint8_t)USB_HID_PROTOCOL_CODE_NONE,         // No Protocol
@@ -203,19 +203,6 @@ static const uint8_t fullSpeedConfigurationDescriptor[]=
     (uint8_t)USB_TRANSFER_TYPE_INTERRUPT,    // Attributes
     0x40,0x00,                      // Size
     0x01,                           // Interval
-
-    /* Endpoint Descriptor */
-
-    0x07,                           // Size of this descriptor in bytes
-    USB_DESCRIPTOR_ENDPOINT,        // Endpoint Descriptor
-    1 | USB_EP_DIRECTION_OUT,   // EndpointAddress ( EP1 OUT )
-    (uint8_t)USB_TRANSFER_TYPE_INTERRUPT,    // Attributes
-    0x40,0x00,                      // size
-    0x01,                           // Interval
-    
-    
-
-
 
 };
 /* MISRAC 2012 deviation block end */
@@ -282,38 +269,14 @@ static sd002 =
     USB_DESCRIPTOR_STRING,
     {'H','I','D',' ','J','o','y','s','t','i','c','k',' ','D','e','m','o'}
 };
-/******************************************************************************
- * Serial number string descriptor.  Note: This should be unique for each unit
- * built on the assembly line.  Plugging in two units simultaneously with the
- * same serial number into a single machine can cause problems.  Additionally,
- * not all hosts support all character values in the serial number string.  The
- * MSD Bulk Only Transport (BOT) specs v1.0 restrict the serial number to
- * consist only of ASCII characters "0" through "9" and capital letters "A"
- * through "F".
- ******************************************************************************/
-const struct
-{
-    uint8_t bLength;                                    // Size of this descriptor in bytes
-    uint8_t bDscType;                                   // STRING descriptor type
-    uint16_t string[12];                                // String
-}
-static serialNumberStringDescriptor =
-{
-    sizeof(serialNumberStringDescriptor),
-    USB_DESCRIPTOR_STRING,
-    {'1','2','3','4','5','6','7','8','9','0','1','2'}
-
-};
-
 /***************************************
  * Array of string descriptors
  ***************************************/
-static USB_DEVICE_STRING_DESCRIPTORS_TABLE stringDescriptors[4]=
+static USB_DEVICE_STRING_DESCRIPTORS_TABLE stringDescriptors[3]=
 {
     (const uint8_t *const)&sd000,
     (const uint8_t *const)&sd001,
     (const uint8_t *const)&sd002,
-    (const uint8_t *const)&serialNumberStringDescriptor,
 };
 
 /*******************************************
@@ -327,7 +290,7 @@ static const USB_DEVICE_MASTER_DESCRIPTOR usbMasterDescriptor =
     NULL,
     0,
     NULL,
-    4,                                                      // Total number of string descriptors available.
+    3,                                                      // Total number of string descriptors available.
     stringDescriptors,                                      // Pointer to array of string descriptors.
     NULL,
     NULL
