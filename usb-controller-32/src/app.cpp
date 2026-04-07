@@ -2,6 +2,7 @@
 #include "logger.h"
 #include "mcp23017.h"
 #include "command_handler.h"
+#include "gamepad.h"
 #include <cstring>
 extern "C" {
 #include "usb_debug.h"
@@ -25,8 +26,18 @@ static bool usbAttachPending = false;
 static TickType_t usbAttachStartTick = 0;
 static const TickType_t kUsbAttachDelayTicks = pdMS_TO_TICKS(250);
 static const TickType_t kHidStartupQuietTicks = pdMS_TO_TICKS(1000);
+static const TickType_t kPotSampleIntervalTicks = pdMS_TO_TICKS(5);
+static const TickType_t kPotLogIntervalTicks = pdMS_TO_TICKS(200);
 static volatile bool hidHostReady = false;
 static volatile TickType_t usbConfiguredTick = 0;
+static TickType_t lastPotSampleTick = 0;
+static TickType_t lastPotLogTick = 0;
+static constexpr uint8_t kPot1AnalogChannel = 4;
+static constexpr uint8_t kPot2AnalogChannel = 5;
+static constexpr uint16_t kAdcMaxCount = 1023;
+static constexpr uint32_t kAdcSampleDelayCycles = 128;
+static constexpr uint32_t kAdcDoneTimeoutCycles = 50000;
+static constexpr uint8_t kAxisChangeThreshold = 1;
 
 /* ---- HID gamepad report ---- */
 USB_DEVICE_HID_TRANSFER_HANDLE hidTxHandle = USB_DEVICE_HID_TRANSFER_HANDLE_INVALID;
@@ -40,6 +51,14 @@ static bool hidReportSynced = false;
 static uint8_t hidIdleRate = 0;
 static uint8_t hidActiveProtocol = 1;
 static constexpr uint8_t kDefaultHidReportId = 0;
+static uint8_t pot1AxisValue = kGamepadAxisCentered;
+static uint8_t pot2AxisValue = kGamepadAxisCentered;
+static uint8_t pendingPot1LogValue = kGamepadAxisCentered;
+static uint8_t pendingPot2LogValue = kGamepadAxisCentered;
+static uint8_t lastLoggedPot1AxisValue = kGamepadAxisCentered;
+static uint8_t lastLoggedPot2AxisValue = kGamepadAxisCentered;
+static bool pot1LogPending = false;
+static bool pot2LogPending = false;
 
 /* 8-byte gamepad report matching hid_rpt0 descriptor:
  *   [0]    buttons 1-8   (bits 0-7)
@@ -51,9 +70,150 @@ static constexpr uint8_t kDefaultHidReportId = 0;
  *   [6]    Z  axis
  *   [7]    Rz axis
  */
-uint8_t gamepadReport[8] = { 0, 0, 0, 0x0F, 128, 128, 128, 128 };
+GamepadReport gamepadReport = {
+    0,
+    0,
+    0,
+    kGamepadHatCentered,
+    kGamepadAxisCentered,
+    kGamepadAxisCentered,
+    kGamepadAxisCentered,
+    kGamepadAxisCentered
+};
 
-static void buildGamepadReport(uint8_t report[8]) {
+static void initializePotAdc()
+{
+    PMD1CLR = _PMD1_AD1MD_MASK;
+    TRISBSET = (1u << 2) | (1u << 3);
+    ANSELBSET = (1u << 2) | (1u << 3);
+
+    AD1CON1 = 0;
+    AD1CON2 = 0;
+    AD1CON3 = 0;
+    AD1CHS = 0;
+    AD1CSSL = 0;
+
+    AD1CON1bits.SSRC = 0b111;
+    AD1CON3bits.ADCS = 15;
+    AD1CON1bits.ADON = 1;
+}
+
+static uint16_t readAnalogChannel(uint8_t channel)
+{
+    AD1CHS = (AD1CHS & ~_AD1CHS_CH0SA_MASK) |
+        (static_cast<uint32_t>(channel) << _AD1CHS_CH0SA_POSITION);
+
+    AD1CON1CLR = _AD1CON1_DONE_MASK;
+    AD1CON1SET = _AD1CON1_SAMP_MASK;
+    for (volatile uint32_t i = 0; i < kAdcSampleDelayCycles; i++)
+    {
+        __asm__ volatile("nop");
+    }
+    AD1CON1CLR = _AD1CON1_SAMP_MASK;
+
+    uint32_t timeout = kAdcDoneTimeoutCycles;
+    while (((AD1CON1 & _AD1CON1_DONE_MASK) == 0u) && (timeout > 0u))
+    {
+        timeout--;
+    }
+
+    if (timeout == 0u)
+    {
+        return (kAdcMaxCount / 2u);
+    }
+
+    return static_cast<uint16_t>(ADC1BUF0 & 0x3FFu);
+}
+
+static uint8_t scaleAnalogToAxis(uint16_t sample)
+{
+    return static_cast<uint8_t>(
+        (static_cast<uint32_t>(sample) * 255u + (kAdcMaxCount / 2u)) / kAdcMaxCount);
+}
+
+static bool axisValueChanged(uint8_t previous, uint8_t current)
+{
+    const uint8_t delta = (previous > current) ? (previous - current) : (current - previous);
+    return delta >= kAxisChangeThreshold;
+}
+
+static bool pollPotentiometers()
+{
+    const TickType_t now = xTaskGetTickCount();
+    if ((now - lastPotSampleTick) < kPotSampleIntervalTicks)
+    {
+        return false;
+    }
+
+    lastPotSampleTick = now;
+
+    const uint8_t nextPot1 = scaleAnalogToAxis(readAnalogChannel(kPot1AnalogChannel));
+    const uint8_t nextPot2 = scaleAnalogToAxis(readAnalogChannel(kPot2AnalogChannel));
+
+    bool changed = false;
+    if (axisValueChanged(pot1AxisValue, nextPot1))
+    {
+        pot1AxisValue = nextPot1;
+        pendingPot1LogValue = nextPot1;
+        pot1LogPending = true;
+        changed = true;
+    }
+    if (axisValueChanged(pot2AxisValue, nextPot2))
+    {
+        pot2AxisValue = nextPot2;
+        pendingPot2LogValue = nextPot2;
+        pot2LogPending = true;
+        changed = true;
+    }
+
+    return changed;
+}
+
+static void flushPendingPotLogs()
+{
+    if (!pot1LogPending && !pot2LogPending)
+    {
+        return;
+    }
+
+    const TickType_t now = xTaskGetTickCount();
+    if ((now - lastPotLogTick) < kPotLogIntervalTicks)
+    {
+        return;
+    }
+
+    const bool logPot1 = pot1LogPending && (pendingPot1LogValue != lastLoggedPot1AxisValue);
+    const bool logPot2 = pot2LogPending && (pendingPot2LogValue != lastLoggedPot2AxisValue);
+
+    if (logPot1 && logPot2)
+    {
+        Logger::getInstance().logf(
+            "[POT] POT_1 axis=%u POT_2 axis=%u", pendingPot1LogValue, pendingPot2LogValue);
+    }
+    else if (logPot1)
+    {
+        Logger::getInstance().logf("[POT] POT_1 axis=%u", pendingPot1LogValue);
+    }
+    else if (logPot2)
+    {
+        Logger::getInstance().logf("[POT] POT_2 axis=%u", pendingPot2LogValue);
+    }
+
+    if (logPot1)
+    {
+        lastLoggedPot1AxisValue = pendingPot1LogValue;
+    }
+    if (logPot2)
+    {
+        lastLoggedPot2AxisValue = pendingPot2LogValue;
+    }
+
+    pot1LogPending = false;
+    pot2LogPending = false;
+    lastPotLogTick = now;
+}
+
+static void buildGamepadReport(GamepadReport& report) {
     uint8_t portA = 0xFF;
     uint8_t portB = 0xFF;
 
@@ -73,14 +233,14 @@ static void buildGamepadReport(uint8_t report[8]) {
         buttons |= (1u << 17);
     }
 
-    report[0] = (uint8_t)(buttons & 0xFF);
-    report[1] = (uint8_t)((buttons >> 8) & 0xFF);
-    report[2] = (uint8_t)((buttons >> 16) & 0x03);
-    report[3] = 0x0F;
-    report[4] = 128;
-    report[5] = 128;
-    report[6] = 128;
-    report[7] = 128;
+    report.buttonsLo = static_cast<uint8_t>(buttons & 0xFF);
+    report.buttonsHi = static_cast<uint8_t>((buttons >> 8) & 0xFF);
+    report.buttonsExtra = static_cast<uint8_t>((buttons >> 16) & 0x03);
+    report.hat = kGamepadHatCentered;
+    report.x = kGamepadAxisCentered;
+    report.y = kGamepadAxisCentered;
+    report.z = pot1AxisValue;
+    report.rz = pot2AxisValue;
 }
 
 static USB_DEVICE_HID_EVENT_RESPONSE hidEventCallback(
@@ -129,7 +289,7 @@ static USB_DEVICE_HID_EVENT_RESPONSE hidEventCallback(
                 const size_t length = (data->reportLength < sizeof(gamepadReport))
                     ? data->reportLength
                     : sizeof(gamepadReport);
-                USB_DEVICE_ControlSend(usbDevHandle, gamepadReport, length);
+                USB_DEVICE_ControlSend(usbDevHandle, &gamepadReport, length);
             } else {
                 USB_DEVICE_ControlStatus(usbDevHandle, USB_DEVICE_CONTROL_STATUS_ERROR);
             }
@@ -231,6 +391,13 @@ extern "C" void APP_Tasks(void) {
         Logger::getInstance().log("APP", "System starting...");
 
         CommandHandler::getInstance().init();
+        initializePotAdc();
+        pot1AxisValue = scaleAnalogToAxis(readAnalogChannel(kPot1AnalogChannel));
+        pot2AxisValue = scaleAnalogToAxis(readAnalogChannel(kPot2AnalogChannel));
+        lastPotSampleTick = xTaskGetTickCount();
+        lastPotLogTick = lastPotSampleTick - kPotLogIntervalTicks;
+        lastLoggedPot1AxisValue = pot1AxisValue;
+        lastLoggedPot2AxisValue = pot2AxisValue;
 
         btn1Pressed = (BUTTON_1_Get() == 0);
         btn2Pressed = (BUTTON_2_Get() == 0);
@@ -287,24 +454,28 @@ extern "C" void APP_Tasks(void) {
             hidReportDirty = true;
         }
     }
+    if (pollPotentiometers()) {
+        hidReportDirty = true;
+    }
+    flushPendingPotLogs();
 
     /* ---- Build and send HID gamepad report ---- */
     const bool hidStartupQuietComplete =
         hidReady && ((xTaskGetTickCount() - usbConfiguredTick) >= kHidStartupQuietTicks);
 
     if (hidReady && (hidHostReady || hidStartupQuietComplete) && !hidTxBusy && hidReportDirty) {
-        uint8_t nextReport[sizeof(gamepadReport)];
+        GamepadReport nextReport {};
         buildGamepadReport(nextReport);
 
         if (hidReportSynced &&
-            std::memcmp(gamepadReport, nextReport, sizeof(gamepadReport)) == 0) {
+            std::memcmp(&gamepadReport, &nextReport, sizeof(gamepadReport)) == 0) {
             hidReportDirty = false;
         } else {
-            std::memcpy(gamepadReport, nextReport, sizeof(gamepadReport));
+            std::memcpy(&gamepadReport, &nextReport, sizeof(gamepadReport));
             hidTxBusy = true;
             USB_DEVICE_HID_RESULT res = USB_DEVICE_HID_ReportSend(
                 USB_DEVICE_HID_INDEX_0, &hidTxHandle,
-                gamepadReport, sizeof(gamepadReport));
+                &gamepadReport, sizeof(gamepadReport));
             hidLastSendResult = (int)res;
             if (res == USB_DEVICE_HID_RESULT_OK) {
                 hidSendCount++;

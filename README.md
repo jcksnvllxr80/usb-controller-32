@@ -1,17 +1,32 @@
 # USB Controller 32
 
-A USB HID gamepad controller built on the **PIC32MX250F128B** microcontroller. The firmware reads button inputs from GPIO pins and an **MCP23017** I2C I/O expander, then reports them to a host PC as a standard USB HID gamepad. Built with **MPLAB Harmony 3**, **FreeRTOS**, and **C++**.
+A USB HID gamepad controller built on the **PIC32MX250F128B** microcontroller. The firmware reads button inputs from GPIO pins, two potentiometers on the PIC32 ADC, and an **MCP23017** I2C I/O expander, then reports them to a host PC as a standard USB HID gamepad. The board-level serial path uses a **MAX3232** level shifter, and the MCU clock is provided by a **20 MHz crystal**. Built with **MPLAB Harmony 3**, **FreeRTOS**, and **C++**.
 
 ![Block Diagram](docs/img/bd-usb-controller-32.png)
 
 ## Features
 
 - USB HID gamepad with 18 button inputs (2 direct GPIO + 16 via MCP23017)
-- 8-byte HID input report with 18 buttons, hat switch, and centered axes
+- 8-byte HID input report with 18 buttons, hat switch, and two live analog axes
 - MCP23017 I2C I/O expander with interrupt-driven input detection
+- MAX3232-backed debug serial / RS-232 path
+- `POT_1` and `POT_2` sampled on `AN4` / `AN5` for `Z` and `Rz`
+- Send-on-change HID reports for buttons and potentiometer axes
+- Rate-limited serial logging for potentiometer changes with `POT_1` / `POT_2` identification
 - FreeRTOS-based task scheduling
 - UART debug logging and USB/HID diagnostics
 - Green and red status LEDs
+
+## Hardware Used
+
+Main ICs and timing parts on this design:
+
+- `PIC32MX250F128B` - main microcontroller, USB device controller, ADC, GPIO, I2C, and UART
+- `MCP23017` - 16-bit I2C GPIO expander for the additional button inputs
+- `MAX3232` - UART level shifter for the board's serial / RS-232 debug path
+- `20 MHz crystal` - external clock source for the PIC32MX250F128B
+- `2x linear potentiometers` - analog controls for `POT_1` and `POT_2`, mapped to HID `Z` and `Rz`
+- `Mini USB breakout` - USB connector breakout for the device port, such as the small Adafruit mini USB breakout the board is using
 
 ## Architecture
 
@@ -33,13 +48,15 @@ A USB HID gamepad controller built on the **PIC32MX250F128B** microcontroller. T
 |---|---|---|---|---|
 | GREEN_LED | 4 | RB0 | Output | Green status LED |
 | RED_LED | 5 | RB1 | Output | Red status LED |
+| POT_1 | 6 | RB2 / AN4 | Input | Analog potentiometer mapped to HID Z axis |
+| POT_2 | 7 | RB3 / AN5 | Input | Analog potentiometer mapped to HID Rz axis |
 | INTERRUPT_A | 14 | RB5 | Input | MCP23017 Port A interrupt (active-low) |
 | INTERRUPT_B | 16 | RB7 | Input | MCP23017 Port B interrupt (active-low) |
 | BUTTON_1 | 25 | RB14 | Input | Direct button input 1 |
 | BUTTON_2 | 26 | RB15 | Input | Direct button input 2 |
 | SDA1 | 18 | RB9 | Bidirectional | I2C1 data to MCP23017 |
 | SCL1 | 17 | RB8 | Output | I2C1 clock to MCP23017 |
-| U1RX | 6 | RB2 | Input | UART1 receive (debug) |
+| U1RX | 12 | RA4 | Input | UART1 receive (debug) |
 | U1TX | 11 | RB4 | Output | UART1 transmit (debug) |
 | D+ | 15 | — | Bidirectional | USB data plus |
 | D− | 16 | — | Bidirectional | USB data minus |
@@ -58,9 +75,10 @@ A USB HID gamepad controller built on the **PIC32MX250F128B** microcontroller. T
 |---|---|---|---|
 | Button inputs (direct) | 2 | PIC32 GPIO | RB14, RB15 |
 | Button inputs (expanded) | 16 | MCP23017 Port A & B | GPA0–7, GPB0–7 |
+| Analog inputs | 2 | PIC32 ADC | POT_1 on AN4 drives HID Z, POT_2 on AN5 drives HID Rz |
 | LED outputs | 2 | PIC32 GPIO | Green (RB0), Red (RB1) |
-| USB HID | 1 | USB peripheral | 18 buttons in an 8-byte report |
-| Debug UART | 1 | UART1 | 115200 baud (TX: RB4, RX: RB2) |
+| USB HID | 1 | USB peripheral | 18 buttons, hat switch, X/Y centered, live Z/Rz in an 8-byte report |
+| Debug UART | 1 | UART1 via MAX3232 | 115200 baud debug/serial path (TX: RB4, RX: RA4) |
 | I2C bus | 1 | I2C1 | MCP23017 at 0x20 |
 
 ## Getting Started
@@ -102,11 +120,13 @@ cd usb-controller-32
 3. Set the programming speed to **Low** if you encounter connection issues.
 4. Click **Program** to flash the `.hex` file to the PIC32MX250F128B.
 
+> Warning: Use a native **USB 2.0** port when connecting this controller to the PC. On some machines, USB 3.x ports/controllers can fail enumeration or produce a Windows Code 10 error with this hardware. If your machine does not have a USB 2.0 port, connect the controller through a **USB 2.0 hub**.
+
 ### Verify Operation
 
 1. After programming, the device should enumerate as a USB HID gamepad on the host PC.
-2. Open **Set up USB game controllers** (Windows) or a gamepad tester to confirm button presses are registered.
-3. Connect a serial terminal (115200 baud, 8N1) to UART1 to view debug logs and issue commands.
+2. Open **Set up USB game controllers** (Windows) or a gamepad tester to confirm button presses and `Z` / `Rz` potentiometer movement are registered.
+3. Connect a serial terminal (115200 baud, 8N1) to UART1 to view debug logs, potentiometer change logs, and issue commands.
 
 ## UART Diagnostics
 
@@ -125,10 +145,19 @@ Useful commands:
 - `usbdbg` - toggle live USB debug logging
 - `usbreset` - soft detach/reattach to force re-enumeration
 
+Automatic serial logs:
+
+- Potentiometer changes are logged automatically as `[POT] POT_1 axis=...` and/or `[POT] POT_2 axis=...`
+- Logs are only emitted when the scaled axis value changes
+- Pot logs are rate-limited to 5 lines per second total
+
 ## Firmware Notes
 
 - GPIO and MCP23017 interrupts only latch state. HID reports are built and sent from `APP_Tasks()`.
-- HID reports are only queued when input state changes, which keeps traffic and debug noise down.
+- `POT_1` and `POT_2` are polled in `APP_Tasks()`, scaled from 10-bit ADC samples to 8-bit HID axis values, and mapped to HID `Z` and `Rz`.
+- Potentiometer state is cached, so a new HID report is only queued when a button changes or when the last-sent `Z` / `Rz` byte changes.
+- Potentiometer serial logs identify which input changed (`POT_1`, `POT_2`, or both), skip repeated values, and are rate-limited to 5 lines per second.
+- HID reports are only queued when button or axis state changes, which keeps traffic and debug noise down.
 
 ## Project Structure
 

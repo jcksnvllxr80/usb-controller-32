@@ -1,5 +1,6 @@
 #include "command_handler.h"
 #include "logger.h"
+#include "gamepad.h"
 #include <cstring>
 #include <xc.h>
 extern "C" {
@@ -33,7 +34,6 @@ extern volatile bool hidReady;
 extern volatile uint32_t hidSendCount;
 extern volatile uint32_t hidSendFail;
 extern volatile int hidLastSendResult;
-extern uint8_t gamepadReport[8];
 
 #define USB_LOG_SIZE 32
 typedef struct {
@@ -233,12 +233,15 @@ void CommandHandler::processCommand() {
         }
 
     } else if (strcmp(cmdBuf_, "hid") == 0) {
+        auto* reportBytes = reinterpret_cast<const uint8_t*>(&gamepadReport);
         log.logf("[HID] ready=%d txBusy=%d sent=%lu fail=%lu last=%d",
             hidReady ? 1 : 0, hidTxBusy ? 1 : 0,
             hidSendCount, hidSendFail, hidLastSendResult);
+        log.logf("[HID] axes: X=%u Y=%u Z=%u Rz=%u",
+            gamepadReport.x, gamepadReport.y, gamepadReport.z, gamepadReport.rz);
         log.logf("[HID] report: %02X %02X %02X %02X %02X %02X %02X %02X",
-            gamepadReport[0], gamepadReport[1], gamepadReport[2], gamepadReport[3],
-            gamepadReport[4], gamepadReport[5], gamepadReport[6], gamepadReport[7]);
+            reportBytes[0], reportBytes[1], reportBytes[2], reportBytes[3],
+            reportBytes[4], reportBytes[5], reportBytes[6], reportBytes[7]);
 
     } else if (strcmp(cmdBuf_, "usbdbg") == 0) {
         bool now = !usb_debug_enabled();
