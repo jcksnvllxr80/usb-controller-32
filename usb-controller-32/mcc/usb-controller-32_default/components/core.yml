@@ -2488,6 +2488,46 @@ data:
           type: Dynamic
         type: Values
       type: Boolean
+    BSP_PIN_6_FUNCTION_TYPE:
+      attributes:
+        id: BSP_PIN_6_FUNCTION_TYPE
+      children:
+      - children:
+        - attributes:
+            value: AN4
+          type: User
+        type: Values
+      type: String
+    BSP_PIN_7_FUNCTION_TYPE:
+      attributes:
+        id: BSP_PIN_7_FUNCTION_TYPE
+      children:
+      - children:
+        - attributes:
+            value: AN5
+          type: User
+        type: Values
+      type: String
+    BSP_PIN_6_FUNCTION_NAME:
+      attributes:
+        id: BSP_PIN_6_FUNCTION_NAME
+      children:
+      - children:
+        - attributes:
+            value: POT_1
+          type: User
+        type: Values
+      type: String
+    BSP_PIN_7_FUNCTION_NAME:
+      attributes:
+        id: BSP_PIN_7_FUNCTION_NAME
+      children:
+      - children:
+        - attributes:
+            value: POT_2
+          type: User
+        type: Values
+      type: String
   userData:
     children:
     - attributes:

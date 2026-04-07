@@ -82,6 +82,16 @@
 #define RED_LED_GetLatch()          ((LATB >> 1) & 0x1)
 #define RED_LED_PIN                  GPIO_PIN_RB1
 
+/*** Macros for POT_1 pin ***/
+#define POT_1_Get()               ((PORTB >> 2) & 0x1)
+#define POT_1_GetLatch()          ((LATB >> 2) & 0x1)
+#define POT_1_PIN                  GPIO_PIN_RB2
+
+/*** Macros for POT_2 pin ***/
+#define POT_2_Get()               ((PORTB >> 3) & 0x1)
+#define POT_2_GetLatch()          ((LATB >> 3) & 0x1)
+#define POT_2_PIN                  GPIO_PIN_RB3
+
 /*** Macros for INTERRUPT_A pin ***/
 #define INTERRUPT_A_Set()               (LATBSET = (1<<5))
 #define INTERRUPT_A_Clear()             (LATBCLR = (1<<5))
