@@ -74,7 +74,7 @@ void I2C1_Initialize(void)
     I2C1BRG = 55;
 
     I2C1CONCLR = _I2C1CON_SIDL_MASK;
-    I2C1CONCLR = _I2C1CON_DISSLW_MASK;
+    I2C1CONSET = _I2C1CON_DISSLW_MASK;
     I2C1CONCLR = _I2C1CON_SMEN_MASK;
 
     /* Clear master interrupt flag */

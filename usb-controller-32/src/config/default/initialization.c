@@ -81,15 +81,15 @@
 #pragma config FPLLIDIV =   DIV_5
 #pragma config FPLLMUL =    MUL_24
 #pragma config FPLLODIV =   DIV_2
-#pragma config UPLLEN =     OFF
-#pragma config UPLLIDIV =   DIV_2
+#pragma config UPLLEN =     ON
+#pragma config UPLLIDIV =   DIV_5
 
 /*** DEVCFG3 ***/
-#pragma config FVBUSONIO =  ON
+#pragma config FVBUSONIO =  OFF
 #pragma config USERID =     0xffff
 #pragma config PMDL1WAY =   ON
 #pragma config IOL1WAY =    ON
-#pragma config FUSBIDIO =   ON
+#pragma config FUSBIDIO =   OFF
 
 
 

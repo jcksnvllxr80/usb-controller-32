@@ -22,8 +22,8 @@ data:
     - children:
       - attributes:
           id: drv_usbfs_v1
-          x: '400'
-          y: '80'
+          x: '235'
+          y: '174'
         type: ElementPosition
       type: ElementPositions
     type: ComponentGraph

@@ -81,6 +81,7 @@ static void lAPP_Tasks(  void *pvParameters  )
     while(true)
     {
         APP_Tasks();
+        vTaskDelay(1U / portTICK_PERIOD_MS);
     }
 }
 

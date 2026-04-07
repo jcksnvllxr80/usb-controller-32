@@ -54,18 +54,42 @@
  ****************************************************/
 static const uint8_t hid_rpt0[] =
 {
-    0x05, 0x01,        /* Usage Page (Generic Desktop)          */
-    0x09, 0x05,        /* Usage (Gamepad)                       */
-    0xA1, 0x01,        /* Collection (Application)              */
-    0x05, 0x09,        /*   Usage Page (Button)                 */
-    0x19, 0x01,        /*   Usage Minimum (Button 1)            */
-    0x29, 0x10,        /*   Usage Maximum (Button 16)           */
-    0x15, 0x00,        /*   Logical Minimum (0)                 */
-    0x25, 0x01,        /*   Logical Maximum (1)                 */
-    0x95, 0x10,        /*   Report Count (16)                   */
-    0x75, 0x01,        /*   Report Size (1)                     */
-    0x81, 0x02,        /*   Input (Data, Variable, Absolute)    */
-    0xC0               /* End Collection                        */
+    0x05,0x01,        // USAGE_PAGE (Generic Desktop)
+    0x09,0x05,        // USAGE (Game Pad)
+    0xA1,0x01,        // COLLECTION (Application)
+    0x15,0x00,        // LOGICAL_MINIMUM(0)
+    0x25,0x01,        // LOGICAL_MAXIMUM(1)
+    0x35,0x00,        // PHYSICAL_MINIMUM(0)
+    0x45,0x01,        // PHYSICAL_MAXIMUM(1)
+    0x75,0x01,        // REPORT_SIZE(1)
+    0x95,0x12,        // REPORT_COUNT(18)  — 8 PortA + 8 PortB + 2 BTN
+    0x05,0x09,        // USAGE_PAGE(Button)
+    0x19,0x01,        // USAGE_MINIMUM(Button 1)
+    0x29,0x12,        // USAGE_MAXIMUM(Button 18)
+    0x81,0x02,        // INPUT(Data,Var,Abs)
+    0x95,0x06,        // REPORT_COUNT(6)   — padding to byte boundary
+    0x81,0x01,        // INPUT(Cnst,Ary,Abs)
+    0x05,0x01,        // USAGE_PAGE(Generic Desktop)
+    0x25,0x07,        // LOGICAL_MAXIMUM(7)
+    0x46,0x3B,0x01,   // PHYSICAL_MAXIMUM(315)
+    0x75,0x04,        // REPORT_SIZE(4)
+    0x95,0x01,        // REPORT_COUNT(1)
+    0x65,0x14,        // UNIT(Eng Rot:Angular Pos)
+    0x09,0x39,        // USAGE(Hat Switch)
+    0x81,0x42,        // INPUT(Data,Var,Abs,Null)
+    0x65,0x00,        // UNIT(None)
+    0x95,0x01,        // REPORT_COUNT(1)
+    0x81,0x01,        // INPUT(Cnst,Ary,Abs)
+    0x26,0xFF,0x00,   // LOGICAL_MAXIMUM(255)
+    0x46,0xFF,0x00,   // PHYSICAL_MAXIMUM(255)
+    0x09,0x30,        // USAGE(X)
+    0x09,0x31,        // USAGE(Y)
+    0x09,0x32,        // USAGE(Z)
+    0x09,0x35,        // USAGE(Rz)
+    0x75,0x08,        // REPORT_SIZE(8)
+    0x95,0x04,        // REPORT_COUNT(4)
+    0x81,0x02,        // INPUT(Data,Var,Abs)
+    0xC0
 };
 
 /**************************************************
@@ -115,7 +139,7 @@ static const USB_DEVICE_DESCRIPTOR usbDeviceDescriptor =
 {
     0x12,                                                   // Size of this descriptor in bytes
     (uint8_t)USB_DESCRIPTOR_DEVICE,                                  // DEVICE descriptor type
-    0x0200,                                                 // USB Spec Release Number in BCD format
+    0x0110,                                                 // USB Spec Release Number in BCD format (1.1 for xHCI TT compat)
     0x00,         // Class Code
     0x00,         // Subclass code
     0x00,         // Protocol code
@@ -123,11 +147,11 @@ static const USB_DEVICE_DESCRIPTOR usbDeviceDescriptor =
 
     USB_DEVICE_EP0_BUFFER_SIZE,                             // Max packet size for EP0, see configuration.h
     0x04D8,                                                 // Vendor ID
-    0x0000,                                                 // Product ID
+    0x005E,                                                 // Product ID
     0x0100,                                                 // Device release number in BCD format
     0x01,                                                   // Manufacturer string index
     0x02,                                                   // Product string index
-    0x00,                                                   // Device serial number string index
+    0x03,                                                   // Device serial number string index
     0x01                                                    // Number of possible configurations
 };
 
@@ -146,7 +170,7 @@ static const uint8_t fullSpeedConfigurationDescriptor[]=
     1,                                                      // Number of interfaces in this configuration
     0x01,                                                   // Index value of this configuration
     0x00,                                                   // Configuration string index
-    USB_ATTRIBUTE_DEFAULT | USB_ATTRIBUTE_SELF_POWERED, // Attributes
+    USB_ATTRIBUTE_DEFAULT, // Attributes
     50,                                                 // Maximum Power: 100mA
 
     /* Interface Descriptor */
@@ -249,24 +273,47 @@ const struct
 {
     uint8_t bLength;                                    // Size of this descriptor in bytes
     uint8_t bDscType;                                   // STRING descriptor type
-    uint16_t string[25];                                // String
+    uint16_t string[17];                                // String
 }
 
 static sd002 =
 {
     (uint8_t)sizeof(sd002),
     USB_DESCRIPTOR_STRING,
-    {'E','n','t','e','r',' ','P','r','o','d','u','c','t',' ','s','t','r','i','n','g',' ','h','e','r','e'}
+    {'H','I','D',' ','J','o','y','s','t','i','c','k',' ','D','e','m','o'}
+};
+/******************************************************************************
+ * Serial number string descriptor.  Note: This should be unique for each unit
+ * built on the assembly line.  Plugging in two units simultaneously with the
+ * same serial number into a single machine can cause problems.  Additionally,
+ * not all hosts support all character values in the serial number string.  The
+ * MSD Bulk Only Transport (BOT) specs v1.0 restrict the serial number to
+ * consist only of ASCII characters "0" through "9" and capital letters "A"
+ * through "F".
+ ******************************************************************************/
+const struct
+{
+    uint8_t bLength;                                    // Size of this descriptor in bytes
+    uint8_t bDscType;                                   // STRING descriptor type
+    uint16_t string[12];                                // String
+}
+static serialNumberStringDescriptor =
+{
+    sizeof(serialNumberStringDescriptor),
+    USB_DESCRIPTOR_STRING,
+    {'1','2','3','4','5','6','7','8','9','0','1','2'}
+
 };
 
 /***************************************
  * Array of string descriptors
  ***************************************/
-static USB_DEVICE_STRING_DESCRIPTORS_TABLE stringDescriptors[3]=
+static USB_DEVICE_STRING_DESCRIPTORS_TABLE stringDescriptors[4]=
 {
     (const uint8_t *const)&sd000,
     (const uint8_t *const)&sd001,
     (const uint8_t *const)&sd002,
+    (const uint8_t *const)&serialNumberStringDescriptor,
 };
 
 /*******************************************
@@ -280,7 +327,7 @@ static const USB_DEVICE_MASTER_DESCRIPTOR usbMasterDescriptor =
     NULL,
     0,
     NULL,
-    3,                                                      // Total number of string descriptors available.
+    4,                                                      // Total number of string descriptors available.
     stringDescriptors,                                      // Pointer to array of string descriptors.
     NULL,
     NULL

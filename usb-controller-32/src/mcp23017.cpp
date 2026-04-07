@@ -3,8 +3,9 @@
 
 MCP23017::MCP23017(uint16_t address)
     : address_(address)
-    , i2cComplete_(nullptr)
-    , i2cMutex_(nullptr)
+    , i2cDone_(false)
+    , bankA_(0)
+    , bankB_(0)
 {
     txBuf_[0] = 0;
     txBuf_[1] = 0;
@@ -12,13 +13,18 @@ MCP23017::MCP23017(uint16_t address)
 }
 
 void MCP23017::i2cCallback(uintptr_t context) {
-    auto sem = reinterpret_cast<SemaphoreHandle_t>(context);
-    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-    xSemaphoreGiveFromISR(sem, &xHigherPriorityTaskWoken);
+    auto* flag = reinterpret_cast<volatile bool*>(context);
+    *flag = true;
 }
 
 bool MCP23017::waitForI2C() {
-    if (xSemaphoreTake(i2cComplete_, pdMS_TO_TICKS(100)) != pdTRUE) {
+    uint32_t timeout = 500000;
+    while (!i2cDone_ && timeout > 0) {
+        timeout--;
+    }
+    i2cDone_ = false;
+
+    if (timeout == 0) {
         Logger::getInstance().log("MCP23017", "I2C timeout");
         return false;
     }
@@ -30,28 +36,20 @@ bool MCP23017::waitForI2C() {
 }
 
 bool MCP23017::writeRegister(Register reg, uint8_t value) {
-    xSemaphoreTake(i2cMutex_, portMAX_DELAY);
-
     txBuf_[0] = static_cast<uint8_t>(reg);
     txBuf_[1] = value;
 
     if (!I2C1_Write(address_, txBuf_, 2)) {
-        xSemaphoreGive(i2cMutex_);
         return false;
     }
 
-    bool ok = waitForI2C();
-    xSemaphoreGive(i2cMutex_);
-    return ok;
+    return waitForI2C();
 }
 
 bool MCP23017::readRegister(Register reg, uint8_t& value) {
-    xSemaphoreTake(i2cMutex_, portMAX_DELAY);
-
     txBuf_[0] = static_cast<uint8_t>(reg);
 
     if (!I2C1_WriteRead(address_, txBuf_, 1, rxBuf_, 1)) {
-        xSemaphoreGive(i2cMutex_);
         return false;
     }
 
@@ -59,7 +57,6 @@ bool MCP23017::readRegister(Register reg, uint8_t& value) {
     if (ok) {
         value = rxBuf_[0];
     }
-    xSemaphoreGive(i2cMutex_);
     return ok;
 }
 
@@ -72,10 +69,7 @@ bool MCP23017::readPortB(uint8_t& value) {
 }
 
 bool MCP23017::init() {
-    i2cComplete_ = xSemaphoreCreateBinary();
-    i2cMutex_ = xSemaphoreCreateMutex();
-
-    I2C1_CallbackRegister(i2cCallback, reinterpret_cast<uintptr_t>(i2cComplete_));
+    I2C1_CallbackRegister(i2cCallback, reinterpret_cast<uintptr_t>(&i2cDone_));
 
     Logger::getInstance().log("MCP23017", "Initializing...");
 
@@ -111,43 +105,121 @@ bool MCP23017::init() {
     return true;
 }
 
-bool MCP23017::handleInterrupts() {
-    bool handled = false;
+bool MCP23017::handleInterruptA() {
+    if (INTERRUPT_A_Get() != 0) return false;
+
+    uint8_t flags = 0;
+    uint8_t capture = 0;
+
+    if (!readRegister(INTFA, flags) || !readRegister(INTCAPA, capture)) return false;
+
+    capture = ~capture;  // pins are active low
+
     auto& logger = Logger::getInstance();
 
-    // INTERRUPT_A is active-low: 0 means port A has a pending interrupt
-    if (INTERRUPT_A_Get() == 0) {
-        uint8_t flags = 0;
-        uint8_t capture = 0;
-
-        if (readRegister(INTFA, flags) && readRegister(INTCAPA, capture)) {
-            for (uint8_t i = 0; i < 8; i++) {
-                if (flags & (1u << i)) {
-                    bool pinState = (capture >> i) & 0x01;
-                    logger.logf("[MCP23017] Port A pin %u interrupt - state: %s",
-                                (unsigned)i, pinState ? "HIGH" : "LOW");
-                }
-            }
-            handled = true;
+    // Pin 0
+    if (flags & (1u << 0)) {
+        if (capture & (1u << 0)) {
+            bankA_ |= (1u << 0);
+            logger.log("MCP23017", "Port A pin 0 HIGH");
+            GREEN_LED_Set();
+        } else {
+            bankA_ &= ~(1u << 0);
+            logger.log("MCP23017", "Port A pin 0 LOW");
+            GREEN_LED_Clear();
         }
     }
-
-    // INTERRUPT_B is active-low: 0 means port B has a pending interrupt
-    if (INTERRUPT_B_Get() == 0) {
-        uint8_t flags = 0;
-        uint8_t capture = 0;
-
-        if (readRegister(INTFB, flags) && readRegister(INTCAPB, capture)) {
-            for (uint8_t i = 0; i < 8; i++) {
-                if (flags & (1u << i)) {
-                    bool pinState = (capture >> i) & 0x01;
-                    logger.logf("[MCP23017] Port B pin %u interrupt - state: %s",
-                                (unsigned)i, pinState ? "HIGH" : "LOW");
-                }
-            }
-            handled = true;
-        }
+    // Pin 1
+    if (flags & (1u << 1)) {
+        if (capture & (1u << 1)) { bankA_ |= (1u << 1);  logger.log("MCP23017", "Port A pin 1 HIGH"); /* TODO */ }
+        else                     { bankA_ &= ~(1u << 1); logger.log("MCP23017", "Port A pin 1 LOW");  /* TODO */ }
+    }
+    // Pin 2
+    if (flags & (1u << 2)) {
+        if (capture & (1u << 2)) { bankA_ |= (1u << 2);  logger.log("MCP23017", "Port A pin 2 HIGH"); /* TODO */ }
+        else                     { bankA_ &= ~(1u << 2); logger.log("MCP23017", "Port A pin 2 LOW");  /* TODO */ }
+    }
+    // Pin 3
+    if (flags & (1u << 3)) {
+        if (capture & (1u << 3)) { bankA_ |= (1u << 3);  logger.log("MCP23017", "Port A pin 3 HIGH"); /* TODO */ }
+        else                     { bankA_ &= ~(1u << 3); logger.log("MCP23017", "Port A pin 3 LOW");  /* TODO */ }
+    }
+    // Pin 4
+    if (flags & (1u << 4)) {
+        if (capture & (1u << 4)) { bankA_ |= (1u << 4);  logger.log("MCP23017", "Port A pin 4 HIGH"); /* TODO */ }
+        else                     { bankA_ &= ~(1u << 4); logger.log("MCP23017", "Port A pin 4 LOW");  /* TODO */ }
+    }
+    // Pin 5
+    if (flags & (1u << 5)) {
+        if (capture & (1u << 5)) { bankA_ |= (1u << 5);  logger.log("MCP23017", "Port A pin 5 HIGH"); /* TODO */ }
+        else                     { bankA_ &= ~(1u << 5); logger.log("MCP23017", "Port A pin 5 LOW");  /* TODO */ }
+    }
+    // Pin 6
+    if (flags & (1u << 6)) {
+        if (capture & (1u << 6)) { bankA_ |= (1u << 6);  logger.log("MCP23017", "Port A pin 6 HIGH"); /* TODO */ }
+        else                     { bankA_ &= ~(1u << 6); logger.log("MCP23017", "Port A pin 6 LOW");  /* TODO */ }
+    }
+    // Pin 7
+    if (flags & (1u << 7)) {
+        if (capture & (1u << 7)) { bankA_ |= (1u << 7);  logger.log("MCP23017", "Port A pin 7 HIGH"); /* TODO */ }
+        else                     { bankA_ &= ~(1u << 7); logger.log("MCP23017", "Port A pin 7 LOW");  /* TODO */ }
     }
 
-    return handled;
+    return true;
+}
+
+bool MCP23017::handleInterruptB() {
+    if (INTERRUPT_B_Get() != 0) return false;
+
+    uint8_t flags = 0;
+    uint8_t capture = 0;
+
+    if (!readRegister(INTFB, flags) || !readRegister(INTCAPB, capture)) return false;
+
+    capture = ~capture;  // pins are active low
+
+    auto& logger = Logger::getInstance();
+
+    // Pin 0
+    if (flags & (1u << 0)) {
+        if (capture & (1u << 0)) { bankB_ |= (1u << 0);  logger.log("MCP23017", "Port B pin 0 HIGH"); /* TODO */ }
+        else                     { bankB_ &= ~(1u << 0); logger.log("MCP23017", "Port B pin 0 LOW");  /* TODO */ }
+    }
+    // Pin 1
+    if (flags & (1u << 1)) {
+        if (capture & (1u << 1)) { bankB_ |= (1u << 1);  logger.log("MCP23017", "Port B pin 1 HIGH"); /* TODO */ }
+        else                     { bankB_ &= ~(1u << 1); logger.log("MCP23017", "Port B pin 1 LOW");  /* TODO */ }
+    }
+    // Pin 2
+    if (flags & (1u << 2)) {
+        if (capture & (1u << 2)) { bankB_ |= (1u << 2);  logger.log("MCP23017", "Port B pin 2 HIGH"); /* TODO */ }
+        else                     { bankB_ &= ~(1u << 2); logger.log("MCP23017", "Port B pin 2 LOW");  /* TODO */ }
+    }
+    // Pin 3
+    if (flags & (1u << 3)) {
+        if (capture & (1u << 3)) { bankB_ |= (1u << 3);  logger.log("MCP23017", "Port B pin 3 HIGH"); /* TODO */ }
+        else                     { bankB_ &= ~(1u << 3); logger.log("MCP23017", "Port B pin 3 LOW");  /* TODO */ }
+    }
+    // Pin 4
+    if (flags & (1u << 4)) {
+        if (capture & (1u << 4)) { bankB_ |= (1u << 4);  logger.log("MCP23017", "Port B pin 4 HIGH"); /* TODO */ }
+        else                     { bankB_ &= ~(1u << 4); logger.log("MCP23017", "Port B pin 4 LOW");  /* TODO */ }
+    }
+    // Pin 5
+    if (flags & (1u << 5)) {
+        if (capture & (1u << 5)) { bankB_ |= (1u << 5);  logger.log("MCP23017", "Port B pin 5 HIGH"); /* TODO */ }
+        else                     { bankB_ &= ~(1u << 5); logger.log("MCP23017", "Port B pin 5 LOW");  /* TODO */ }
+    }
+    // Pin 6
+    if (flags & (1u << 6)) {
+        if (capture & (1u << 6)) { bankB_ |= (1u << 6);  logger.log("MCP23017", "Port B pin 6 HIGH"); /* TODO */ }
+        else                     { bankB_ &= ~(1u << 6); logger.log("MCP23017", "Port B pin 6 LOW");  /* TODO */ }
+    }
+    // Pin 7
+    if (flags & (1u << 7)) {
+        if (capture & (1u << 7)) { bankB_ |= (1u << 7);  logger.log("MCP23017", "Port B pin 7 HIGH"); /* TODO */ }
+        else                     { bankB_ &= ~(1u << 7); logger.log("MCP23017", "Port B pin 7 LOW");  /* TODO */ }
+    }
+
+    return true;
 }

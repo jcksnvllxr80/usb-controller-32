@@ -44,6 +44,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "usb_debug.h"
 #include "usb/src/usb_external_dependencies.h"
 #include "usb/usb_common.h"
 #include "usb/usb_chapter_9.h"
@@ -53,6 +54,55 @@
 
 #include "usb/src/usb_device_local.h"
 #include "driver/usb/drv_usb.h"
+
+/* ---- USB enumeration diagnostic counters (ISR-safe) ---- */
+volatile uint32_t usbDiag_setupCount = 0;
+volatile uint32_t usbDiag_getDescDev = 0;
+volatile uint32_t usbDiag_getDescCfg = 0;
+volatile uint32_t usbDiag_getDescStr = 0;
+volatile uint32_t usbDiag_setAddress = 0;
+volatile uint32_t usbDiag_setConfig = 0;
+volatile uint32_t usbDiag_ctrlSendOk = 0;
+volatile uint32_t usbDiag_ctrlSendFail = 0;
+volatile uint32_t usbDiag_ctrlSendBytes = 0;
+volatile uint32_t usbDiag_resetCount = 0;
+volatile uint32_t usbDiag_lastSetupReq = 0;
+volatile uint32_t usbDiag_lastSetupVal = 0;
+volatile uint32_t usbDiag_lastSetupLen = 0;
+volatile uint32_t usbDiag_irpSubmitCount = 0;
+volatile uint32_t usbDiag_drvEventCount = 0;
+volatile uint32_t usbDiag_errorCount = 0;
+volatile uint32_t usbDiag_errorFlags = 0;
+
+/* ---- USB transaction ring buffer (ISR-safe) ---- */
+#define USB_LOG_SIZE 32
+typedef struct {
+    uint8_t  bmRequestType;   /* SETUP byte 0: direction|type|recipient */
+    uint8_t  bRequest;        /* SETUP byte 1 */
+    uint16_t wValue;
+    uint16_t wIndex;
+    uint16_t wLength;
+    uint8_t  action;          /* 0=SETUP, 1=SEND ok, 2=SEND fail/STALL, 3=STATUS ok, 4=RESET, 5=EVENT, 6=FWD_CLASS */
+    uint8_t  extra;           /* action-specific (e.g. event code, size low byte) */
+} usb_log_entry_t;
+
+volatile usb_log_entry_t usbLog[USB_LOG_SIZE];
+volatile uint32_t usbLogHead = 0;
+
+static void usbLogPush(uint8_t action, uint8_t extra,
+                        uint8_t bmReq, uint8_t bReq,
+                        uint16_t wVal, uint16_t wIdx, uint16_t wLen)
+{
+    uint32_t idx = usbLogHead % USB_LOG_SIZE;
+    usbLog[idx].action = action;
+    usbLog[idx].extra  = extra;
+    usbLog[idx].bmRequestType = bmReq;
+    usbLog[idx].bRequest = bReq;
+    usbLog[idx].wValue  = wVal;
+    usbLog[idx].wIndex  = wIdx;
+    usbLog[idx].wLength = wLen;
+    usbLogHead++;
+}
 
 /**********************************
  * Device layer instance objects.
@@ -156,7 +206,7 @@ SYS_MODULE_OBJ USB_DEVICE_Initialize
     usbDeviceThisInstance->remoteWakeupStatus = USB_DEVICE_REMOTE_WAKEUP_DISABLED;
 
     /* Initialize power source to bus power */
-    usbDeviceThisInstance->usbDeviceStatusStruct.powerState = USB_DEVICE_POWER_STATE_SELF_POWERED;
+    usbDeviceThisInstance->usbDeviceStatusStruct.powerState = USB_DEVICE_POWER_STATE_BUS_POWERED;
 
     /* Reset set address flag.*/
     usbDeviceThisInstance->usbDeviceStatusStruct.setAddressPending = false;
@@ -1167,6 +1217,7 @@ USB_DEVICE_CONTROL_TRANSFER_RESULT USB_DEVICE_ControlSend
     }
 
     /* Submit the IRP to the USBCD */
+    usbDiag_irpSubmitCount++;
     (void)usbDeviceThisInstance->driverInterface->deviceIRPSubmit( usbDeviceThisInstance->usbCDHandle, controlEndpointTx, irpHandle);
 
     return USB_DEVICE_CONTROL_TRANSFER_RESULT_SUCCESS;
@@ -1931,6 +1982,8 @@ void F_USB_DEVICE_EventHandler
 
             /* Change device state to Default */
             usbDeviceThisInstance->usbDeviceStatusStruct.usbDeviceState = USB_DEVICE_STATE_DEFAULT;
+            usbDiag_resetCount++;
+            usb_debug_printf("[USB] RESET #%lu", usbDiag_resetCount);
 
             /* Reset means chirping has already happened. So, we must be knowing
                the speed. Get the speed and save it for future. */
@@ -1991,6 +2044,7 @@ void F_USB_DEVICE_EventHandler
 
             /* VBUS is valid.*/
             usbDeviceThisInstance->usbDeviceStatusStruct.usbDeviceState = USB_DEVICE_STATE_ATTACHED;
+            usb_debug_printf("[USB] VBUS valid — ATTACHED");
             break;
 
         case DRV_USB_EVENT_DEVICE_SESSION_INVALID:
@@ -2056,8 +2110,19 @@ void  F_USB_DEVICE_ControlTransferHandler
   
     if( transferEvent == USB_DEVICE_EVENT_CONTROL_TRANSFER_SETUP_REQUEST )
     {
-        /* Get pointer to Setup Packet */ 
+        /* Get pointer to Setup Packet */
         setupPkt = (USB_SETUP_PACKET *)(eventData);
+
+        /* --- Diagnostic: track SETUP packets --- */
+        usbDiag_setupCount++;
+        usbDiag_lastSetupReq = setupPkt->bRequest;
+        usbDiag_lastSetupVal = setupPkt->wValue;
+        usbDiag_lastSetupLen = setupPkt->wLength;
+
+        /* Log SETUP packet */
+        usb_debug_printf("[SETUP] bm=%02X bR=%02X wV=%04X wI=%04X wL=%u",
+            ((uint8_t*)setupPkt)[0], setupPkt->bRequest,
+            setupPkt->wValue, setupPkt->wIndex, setupPkt->wLength);
 
         /* Get of Length of the Data Stage */
         usbDeviceThisInstance->controlTransferDataStageSize = setupPkt->wLength;
@@ -2243,6 +2308,8 @@ void F_USB_DEVICE_ForwardControlXfrToFunction
                 controlTransfer->handlerIndex = (uint16_t)lFuncDriverRegTable->funcDriverIndex;
 
                 /* Forward the SETUP packet to the function driver */
+                usb_debug_printf("[FWD] intf=%u bR=%02X wV=%04X wL=%u",
+                    interfaceNumber, setupPkt->bRequest, setupPkt->wValue, setupPkt->wLength);
                 controlTransfer->handler( controlTransfer->handlerIndex, USB_DEVICE_EVENT_CONTROL_TRANSFER_SETUP_REQUEST, setupPkt);
             }
             else
@@ -2384,6 +2451,7 @@ void F_USB_DEVICE_ProcessStandardDeviceGetRequests
         switch(setupPkt->bDescriptorType)
         {
             case (uint8_t)USB_DESCRIPTOR_DEVICE:
+                usbDiag_getDescDev++;
                 if(usbDeviceThisInstance->usbDeviceStatusStruct.usbSpeed == USB_SPEED_HIGH)
                 {
                     /* High speed descriptor. */
@@ -2399,7 +2467,7 @@ void F_USB_DEVICE_ProcessStandardDeviceGetRequests
                 {
                     /* Full/low speed descriptor.*/
                     if( ptrMasterDescTable->deviceDescriptor == NULL )
-                    {   
+                    {
                         SYS_DEBUG_MESSAGE(SYS_ERROR_INFO, "\r\nUSB Device Layer: Full/Low speed device descriptor is NULL");
                     }
 
@@ -2411,7 +2479,8 @@ void F_USB_DEVICE_ProcessStandardDeviceGetRequests
                 size = 18;
                 break;
 
-            case (uint8_t)USB_DESCRIPTOR_CONFIGURATION:                
+            case (uint8_t)USB_DESCRIPTOR_CONFIGURATION:
+                usbDiag_getDescCfg++;
 
                 /* Get correct pointer to the descriptor based on config value.
                  * setupPkt->bDscIndex indicates the host requested
@@ -2483,7 +2552,7 @@ void F_USB_DEVICE_ProcessStandardDeviceGetRequests
                 break;
 
             case (uint8_t)USB_DESCRIPTOR_STRING:
-
+                usbDiag_getDescStr++;
                 /* A string descriptor was requested */
                 size = M_USB_DEVICE_GetStringDescriptorRequest(ptrMasterDescTable, setupPkt, &pData );
                 break;
@@ -2524,6 +2593,8 @@ void F_USB_DEVICE_ProcessStandardDeviceGetRequests
     {
         if(pData == NULL)
         {
+            usbDiag_ctrlSendFail++;
+            usb_debug_printf("[STALL] bR=%02X wV=%04X — no data", setupPkt->bRequest, setupPkt->wValue);
             /* We don't have valid data to send. STALL the transfer */
             (void) USB_DEVICE_ControlStatus((USB_DEVICE_HANDLE)usbDeviceThisInstance, USB_DEVICE_CONTROL_STATUS_ERROR );
         }
@@ -2535,6 +2606,9 @@ void F_USB_DEVICE_ProcessStandardDeviceGetRequests
                 size = setupPkt->wLength;
             }
 
+            usbDiag_ctrlSendOk++;
+            usbDiag_ctrlSendBytes = size;
+            usb_debug_printf("[SEND] bR=%02X wV=%04X %u bytes", setupPkt->bRequest, setupPkt->wValue, size);
             /* Send the data stage */
             (void) USB_DEVICE_ControlSend( (USB_DEVICE_HANDLE)usbDeviceThisInstance, pData, size );
         }
@@ -2763,18 +2837,18 @@ void F_USB_DEVICE_ProcessStandardDeviceSetRequests
     switch(setupPkt->bRequest)
     {
         case USB_REQUEST_SET_ADDRESS:
-
+            usbDiag_setAddress++;
             /* Got set address command. Change the address only after responding
                to the current request.*/
-            
+
             usbDeviceThisInstance->usbDeviceStatusStruct.setAddressPending = true;
             usbDeviceThisInstance->deviceAddress = setupPkt->bDevADR;
             controlStatus = USB_DEVICE_CONTROL_STATUS_OK;
             
             break;
 
-        case USB_REQUEST_SET_CONFIGURATION: 
-
+        case USB_REQUEST_SET_CONFIGURATION:
+            usbDiag_setConfig++;
             /* Device falls back to addressed state if configuration value is 0,
              * and if the device is already in configured state. */
             
@@ -2830,6 +2904,7 @@ void F_USB_DEVICE_ProcessStandardDeviceSetRequests
                     /* Initialize all function drivers and change to configured
                      * state only if all function drivers are initialized
                      * successfully. */
+                    usb_debug_printf("[USB] SET_CONFIG val=%u", setupPkt->wValue);
                     F_USB_DEVICE_ConfigureDevice(usbDeviceThisInstance);
 
                     /* Change the state to configured. */

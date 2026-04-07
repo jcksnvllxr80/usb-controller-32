@@ -50,4 +50,14 @@ data:
           type: Dynamic
         type: Values
       type: Integer
+    CONFIG_USB_DEVICE_HID_REPORT_DESCRIPTOR_TYPE:
+      attributes:
+        id: CONFIG_USB_DEVICE_HID_REPORT_DESCRIPTOR_TYPE
+      children:
+      - children:
+        - attributes:
+            value: Joystick
+          type: User
+        type: Values
+      type: Combo
   userData: {}

@@ -2,10 +2,6 @@
 
 #include "definitions.h"
 
-extern "C" {
-#include "semphr.h"
-}
-
 class Logger {
 public:
     static Logger& getInstance();
@@ -24,8 +20,7 @@ private:
 
     static void txCallback(uintptr_t context);
 
-    SemaphoreHandle_t txComplete_;
-    SemaphoreHandle_t mutex_;
+    volatile bool txDone_;
     bool initialized_;
     char buffer_[256];
 };

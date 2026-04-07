@@ -71,6 +71,7 @@ PLIB_TEMPLATE void USB_OperatingModeSelect_Default( USB_MODULE_ID index , USB_OP
              break;
             
         case USB_OPMODE_DEVICE:
+             usb->UxOTGCON.OTGEN = 1;
              usb->UxCON.UxCONbits.USBEN_SOFEN = 1; 
             break;
 

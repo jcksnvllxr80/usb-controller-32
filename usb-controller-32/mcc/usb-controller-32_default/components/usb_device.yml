@@ -22,12 +22,22 @@ data:
     - children:
       - attributes:
           id: usb_device
-          x: '10'
-          y: '197'
+          x: '52'
+          y: '370'
         type: ElementPosition
       type: ElementPositions
     type: ComponentGraph
   symbols:
+    CONFIG_USB_DEVICE_ATTRIBUTE_SELF_POWERED:
+      attributes:
+        id: CONFIG_USB_DEVICE_ATTRIBUTE_SELF_POWERED
+      children:
+      - children:
+        - attributes:
+            value: 'false'
+          type: User
+        type: Values
+      type: Boolean
     CONFIG_USB_DEVICE_CONFIG_DESCRPTR_SIZE:
       attributes:
         id: CONFIG_USB_DEVICE_CONFIG_DESCRPTR_SIZE
@@ -50,6 +60,44 @@ data:
           type: Dynamic
         type: Values
       type: Integer
+    CONFIG_USB_DEVICE_FEATURE_ENABLE_ADVANCED_STRING_DESCRIPTOR_TABLE:
+      attributes:
+        id: CONFIG_USB_DEVICE_FEATURE_ENABLE_ADVANCED_STRING_DESCRIPTOR_TABLE
+      children:
+      - children:
+        - attributes:
+            value: 'false'
+          type: User
+        type: Values
+      type: Boolean
+    CONFIG_USB_DEVICE_FEATURE_ENABLE_BOS_DESCRIPTOR:
+      attributes:
+        id: CONFIG_USB_DEVICE_FEATURE_ENABLE_BOS_DESCRIPTOR
+      children:
+      - children:
+        - attributes:
+            value: 'false'
+          type: User
+        type: Values
+      type: Boolean
+    CONFIG_USB_DEVICE_FEATURE_ENABLE_MICROSOFT_OS_DESCRIPTOR:
+      attributes:
+        id: CONFIG_USB_DEVICE_FEATURE_ENABLE_MICROSOFT_OS_DESCRIPTOR
+      children:
+      - children:
+        - attributes:
+            id: visible
+          children:
+          - type: Value
+            value: 'true'
+          type: Boolean
+        type: Attributes
+      - children:
+        - attributes:
+            value: 'false'
+          type: User
+        type: Values
+      type: Boolean
     CONFIG_USB_DEVICE_FUNCTIONS_NUMBER:
       attributes:
         id: CONFIG_USB_DEVICE_FUNCTIONS_NUMBER
@@ -72,4 +120,57 @@ data:
           type: Dynamic
         type: Values
       type: Integer
+    CONFIG_USB_DEVICE_MSD_DISK_IMAGE:
+      attributes:
+        id: CONFIG_USB_DEVICE_MSD_DISK_IMAGE
+      children:
+      - children:
+        - attributes:
+            id: usb_device
+            value: 'false'
+          type: Dynamic
+        type: Values
+      type: Boolean
+    CONFIG_USB_DEVICE_PRODUCT_ID_IDX0:
+      attributes:
+        id: CONFIG_USB_DEVICE_PRODUCT_ID_IDX0
+      children:
+      - children:
+        - attributes:
+            id: usb_device
+            value: '0x005E'
+          type: Dynamic
+        type: Values
+      type: String
+    CONFIG_USB_DEVICE_PRODUCT_ID_SELECTION_IDX0:
+      attributes:
+        id: CONFIG_USB_DEVICE_PRODUCT_ID_SELECTION_IDX0
+      children:
+      - children:
+        - attributes:
+            value: hid_joystick_demo
+          type: User
+        type: Values
+      type: Combo
+    CONFIG_USB_DEVICE_PRODUCT_STRING_DESCRIPTOR:
+      attributes:
+        id: CONFIG_USB_DEVICE_PRODUCT_STRING_DESCRIPTOR
+      children:
+      - children:
+        - attributes:
+            id: usb_device
+            value: HID Joystick Demo
+          type: Dynamic
+        type: Values
+      type: String
+    CONFIG_USB_DEVICE_SERIAL_NUMBER_STRING_ENABLE:
+      attributes:
+        id: CONFIG_USB_DEVICE_SERIAL_NUMBER_STRING_ENABLE
+      children:
+      - children:
+        - attributes:
+            value: 'true'
+          type: User
+        type: Values
+      type: Boolean
   userData: {}

@@ -22,8 +22,8 @@ data:
     - children:
       - attributes:
           id: i2c1
-          x: '630'
-          y: '202'
+          x: '288'
+          y: '88'
         type: ElementPosition
       type: ElementPositions
     type: ComponentGraph
@@ -61,28 +61,16 @@ data:
           type: Dynamic
         type: Values
       type: Integer
-    I2CS_CORE_TIMER_FREQUENCY:
+    I2C_CLOCK_SPEED:
       attributes:
-        id: I2CS_CORE_TIMER_FREQUENCY
+        id: I2C_CLOCK_SPEED
       children:
       - children:
         - attributes:
-            id: i2c1
-            value: '24000000'
-          type: Dynamic
+            value: '400000'
+          type: User
         type: Values
-      type: Integer
-    I2C_CLOCK_FREQ:
-      attributes:
-        id: I2C_CLOCK_FREQ
-      children:
-      - children:
-        - attributes:
-            id: i2c1
-            value: '48000000'
-          type: Dynamic
-        type: Values
-      type: Integer
+      type: Long
     I2C_CLOCK_SPEED_HZ:
       attributes:
         id: I2C_CLOCK_SPEED_HZ
@@ -94,14 +82,14 @@ data:
           type: Dynamic
         type: Values
       type: Long
-    I2C_CLOCK_SPEED:
+    I2C_DISSLW:
       attributes:
-        id: I2C_CLOCK_SPEED
+        id: I2C_DISSLW
       children:
       - children:
         - attributes:
-            value: '400000'
+            value: 'true'
           type: User
         type: Values
-      type: Long
+      type: Boolean
   userData: {}

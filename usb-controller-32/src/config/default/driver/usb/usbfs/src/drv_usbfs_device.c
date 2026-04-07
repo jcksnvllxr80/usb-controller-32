@@ -105,7 +105,7 @@ void F_DRV_USBFS_DEVICE_Initialize
 )
 {
     /* Initialize device specific flags */
-    drvObj->vbusIsValid = false;
+    drvObj->vbusIsValid = true;  /* Bus-powered: VBUS always present */
     drvObj->isAttached = false;
     drvObj->isSuspended = false;
 
@@ -285,6 +285,10 @@ void DRV_USBFS_DEVICE_Attach(DRV_HANDLE handle)
         usbIntResume = (((uint32_t)USB_INT_ALL) & ~((uint32_t)USB_INT_RESUME));
         usbOtg = ((~(uint32_t)USB_OTG_INT_ALL) | (uint32_t)USB_OTG_INT_SESSION_VALID | (uint32_t)USB_OTG_INT_ACTIVITY_DETECT);
         PLIB_USB_AllInterruptEnable(((DRV_USBFS_OBJ *)handle)->usbID, (USB_INTERRUPTS)usbIntResume, USB_ERR_INT_ALL, (USB_OTG_INTERRUPTS)usbOtg);
+
+        /* Now that interrupts are enabled and the device layer is ready,
+         * enable the D+ pull-up to signal the host. */
+        PLIB_USB_OTG_PullUpPullDownSetup(((DRV_USBFS_OBJ *)handle)->usbID, USB_OTG_DPLUS_PULLUP, true);
     }
     else
     {
@@ -2091,6 +2095,12 @@ void F_DRV_USBFS_DEVICE_Tasks_ISR(DRV_USBFS_OBJ * hDriver)
             /* Get the error type to send to the client */
             readTemp = PLIB_USB_ErrorInterruptFlagAllGet(usbID);
             errorType = (uint32_t)readTemp;
+
+            /* --- Diagnostic: persistent USB error tracking --- */
+            extern volatile uint32_t usbDiag_errorCount;
+            extern volatile uint32_t usbDiag_errorFlags;
+            usbDiag_errorCount++;
+            usbDiag_errorFlags |= errorType;
 
             /* Clear the base error flags and the interrupt flag */
             PLIB_USB_ErrorInterruptFlagClear( usbID, (USB_ERROR_INTERRUPTS)errorType );
