@@ -202,7 +202,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: '0'
+            value: '48000000'
           type: Dynamic
         type: Values
       type: Integer
@@ -367,7 +367,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: '0'
+            value: '48000000'
           type: Dynamic
         type: Values
       type: Integer
@@ -1046,7 +1046,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'true'
+            value: 'false'
           type: Dynamic
         type: Values
       type: Boolean
@@ -1057,7 +1057,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'false'
+            value: 'true'
           type: Dynamic
         type: Values
       type: Boolean
@@ -1068,7 +1068,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'false'
+            value: 'true'
           type: Dynamic
         type: Values
       type: Boolean
@@ -1079,7 +1079,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: '31'
+            value: '30'
           type: Dynamic
         type: Values
       type: Hex
@@ -1090,7 +1090,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'false'
+            value: 'true'
           type: Dynamic
         type: Values
       type: Boolean
@@ -1101,7 +1101,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'true'
+            value: 'false'
           type: Dynamic
         type: Values
       type: Boolean
@@ -1112,7 +1112,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'false'
+            value: 'true'
           type: Dynamic
         type: Values
       type: Boolean
@@ -1123,7 +1123,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'false'
+            value: 'true'
           type: Dynamic
         type: Values
       type: Boolean
@@ -1134,7 +1134,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'true'
+            value: 'false'
           type: Dynamic
         type: Values
       type: Boolean
@@ -1145,7 +1145,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'false'
+            value: 'true'
           type: Dynamic
         type: Values
       type: Boolean
@@ -1156,7 +1156,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'true'
+            value: 'false'
           type: Dynamic
         type: Values
       type: Boolean
@@ -1167,7 +1167,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'false'
+            value: 'true'
           type: Dynamic
         type: Values
       type: Boolean
@@ -1178,7 +1178,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'false'
+            value: 'true'
           type: Dynamic
         type: Values
       type: Boolean
@@ -1189,7 +1189,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'true'
+            value: 'false'
           type: Dynamic
         type: Values
       type: Boolean
@@ -1200,7 +1200,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'false'
+            value: 'true'
           type: Dynamic
         type: Values
       type: Boolean
@@ -1211,7 +1211,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'true'
+            value: 'false'
           type: Dynamic
         type: Values
       type: Boolean
@@ -1222,7 +1222,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'true'
+            value: 'false'
           type: Dynamic
         type: Values
       type: Boolean
@@ -1233,7 +1233,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'false'
+            value: 'true'
           type: Dynamic
         type: Values
       type: Boolean
@@ -1244,7 +1244,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'false'
+            value: 'true'
           type: Dynamic
         type: Values
       type: Boolean
@@ -1255,7 +1255,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'false'
+            value: 'true'
           type: Dynamic
         type: Values
       type: Boolean
@@ -1266,7 +1266,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'false'
+            value: 'true'
           type: Dynamic
         type: Values
       type: Boolean
@@ -1277,36 +1277,10 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'true'
+            value: 'false'
           type: Dynamic
         type: Values
       type: Boolean
-    EVIC_INT_ASM:
-      attributes:
-        id: EVIC_INT_ASM
-      children:
-      - children:
-        - attributes:
-            id: enabled
-          children:
-          - type: Value
-            value: 'false'
-          type: Boolean
-        type: Attributes
-      type: File
-    INTERRUPTS_ASM:
-      attributes:
-        id: INTERRUPTS_ASM
-      children:
-      - children:
-        - attributes:
-            id: enabled
-          children:
-          - type: Value
-            value: 'false'
-          type: Boolean
-        type: Attributes
-      type: File
     USB_1_INTERRUPT_ENABLE_UPDATE:
       attributes:
         id: USB_1_INTERRUPT_ENABLE_UPDATE
@@ -1314,7 +1288,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'true'
+            value: 'false'
           type: Dynamic
         type: Values
       type: Boolean
@@ -1325,7 +1299,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'false'
+            value: 'true'
           type: Dynamic
         type: Values
       type: Boolean
@@ -1336,7 +1310,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: 'false'
+            value: 'true'
           type: Dynamic
         type: Values
       type: Boolean
@@ -1347,7 +1321,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: USB_1_Handler
+            value: DRV_USBFS_USB_Handler
           type: Dynamic
         type: Values
       type: String
@@ -1358,7 +1332,7 @@ data:
       - children:
         - attributes:
             id: core
-            value: '16909058'
+            value: '131842'
           type: Dynamic
         type: Values
       type: Hex
@@ -2444,6 +2418,76 @@ data:
           type: Dynamic
         type: Values
       type: String
+    EVIC_INT_ASM:
+      attributes:
+        id: EVIC_INT_ASM
+      children:
+      - children:
+        - attributes:
+            id: enabled
+          children:
+          - type: Value
+            value: 'true'
+          type: Boolean
+        type: Attributes
+      type: File
+    INTERRUPTS_ASM:
+      attributes:
+        id: INTERRUPTS_ASM
+      children:
+      - children:
+        - attributes:
+            id: enabled
+          children:
+          - type: Value
+            value: 'true'
+          type: Boolean
+        type: Attributes
+      type: File
+    USB_1_INTERRUPT_ENABLE:
+      attributes:
+        id: USB_1_INTERRUPT_ENABLE
+      children:
+      - children:
+        - attributes:
+            id: drv_usbfs_v1
+            value: 'true'
+          type: Dynamic
+        type: Values
+      type: Boolean
+    USB_1_INTERRUPT_HANDLER_LOCK:
+      attributes:
+        id: USB_1_INTERRUPT_HANDLER_LOCK
+      children:
+      - children:
+        - attributes:
+            id: drv_usbfs_v1
+            value: 'true'
+          type: Dynamic
+        type: Values
+      type: Boolean
+    USB_1_INTERRUPT_HANDLER:
+      attributes:
+        id: USB_1_INTERRUPT_HANDLER
+      children:
+      - children:
+        - attributes:
+            id: drv_usbfs_v1
+            value: DRV_USBFS_USB_Handler
+          type: Dynamic
+        type: Values
+      type: String
+    USB_CLOCK_ENABLE:
+      attributes:
+        id: USB_CLOCK_ENABLE
+      children:
+      - children:
+        - attributes:
+            id: drv_usbfs_v1
+            value: 'true'
+          type: Dynamic
+        type: Values
+      type: Boolean
   userData:
     children:
     - attributes:

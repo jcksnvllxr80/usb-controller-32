@@ -13,3 +13,6 @@ out/
 
 # vscode
 .vscode/
+
+# claude
+.claude/

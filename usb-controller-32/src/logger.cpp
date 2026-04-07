@@ -65,6 +65,11 @@ void Logger::log(const char* tag, const char* message) {
     }
 }
 
+/* C-callable wrapper for usb_debug.c drain */
+extern "C" void logger_write_line(const char *line) {
+    Logger::getInstance().log(line);
+}
+
 void Logger::logf(const char* format, ...) {
     if (!initialized_) return;
 

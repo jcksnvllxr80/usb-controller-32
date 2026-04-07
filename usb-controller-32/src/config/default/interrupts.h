@@ -56,6 +56,7 @@
 // Section: Handler Routines
 // *****************************************************************************
 // *****************************************************************************
+void DRV_USBFS_USB_Handler( void );
 void UART_1_InterruptHandler( void );
 void I2C_1_InterruptHandler( void );
 void CHANGE_NOTICE_InterruptHandler( void );
