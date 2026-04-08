@@ -46,21 +46,34 @@ Main ICs and timing parts on this design:
 
 | Signal | Pin | Port | Direction | Description |
 |---|---|---|---|---|
+| MCLR | 1 | — | Input | Master clear (active-low reset); 10k pull-up to VDD; PICkit 5 pin 1 (VPP) |
+| PGED1 | 2 | RA0 | Programming | ICSP data (PICkit 5 pin 4) |
+| PGEC1 | 3 | RA1 | Programming | ICSP clock (PICkit 5 pin 5) |
 | GREEN_LED | 4 | RB0 | Output | Green status LED |
 | RED_LED | 5 | RB1 | Output | Red status LED |
 | POT_1 | 6 | RB2 / AN4 | Input | Analog potentiometer mapped to HID Z axis |
 | POT_2 | 7 | RB3 / AN5 | Input | Analog potentiometer mapped to HID Rz axis |
+| VSS | 8 | — | Power | Ground |
+| OSC1 | 9 | RA2 | Input | 20 MHz crystal input |
+| OSC2 | 10 | RA3 | Output | 20 MHz crystal output |
+| U1TX | 11 | RB4 | Output | UART1 transmit (debug) |
+| U1RX | 12 | RA4 | Input | UART1 receive (debug) |
+| VDD | 13 | — | Power | 5V supply |
 | INTERRUPT_A | 14 | RB5 | Input | MCP23017 Port A interrupt (active-low) |
+| VBUS | 15 | — | Power | USB 5V bus voltage; connected to VCC |
 | INTERRUPT_B | 16 | RB7 | Input | MCP23017 Port B interrupt (active-low) |
+| SCL1 | 17 | RB8 | Output | I2C1 clock to MCP23017 |
+| SDA1 | 18 | RB9 | Bidirectional | I2C1 data to MCP23017 |
+| VSS | 19 | — | Power | Ground |
+| VCAP | 20 | — | Power | Internal core regulator output; 0.1µF cap to VSS |
+| D+ | 21 | — | Bidirectional | USB data plus |
+| D− | 22 | — | Bidirectional | USB data minus |
+| VUSB3V3 | 23 | — | Power | USB 3.3V supply; decoupling capacitors to GND |
+| RB13 | 24 | RB13 | NC | Not connected |
 | BUTTON_1 | 25 | RB14 | Input | Direct button input 1 |
 | BUTTON_2 | 26 | RB15 | Input | Direct button input 2 |
-| SDA1 | 18 | RB9 | Bidirectional | I2C1 data to MCP23017 |
-| SCL1 | 17 | RB8 | Output | I2C1 clock to MCP23017 |
-| U1RX | 12 | RA4 | Input | UART1 receive (debug) |
-| U1TX | 11 | RB4 | Output | UART1 transmit (debug) |
-| D+ | 15 | — | Bidirectional | USB data plus |
-| D− | 16 | — | Bidirectional | USB data minus |
-| VUSB3V3 | 14 | — | Power | USB 3.3V supply |
+| AVSS | 27 | — | Power | Analog ground |
+| AVDD | 28 | — | Power | 5V analog supply |
 
 ### MCP23017 I/O Expander (I2C address 0x20)
 
