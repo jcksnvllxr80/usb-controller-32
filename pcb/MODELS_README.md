@@ -16,12 +16,12 @@
 ### Pin Map
 | Pin | Signal | Notes |
 |-----|--------|-------|
-| 1 | VBUS | +5 V from USB host |
-| 2 | D− | USB data − |
+| 1 | GND | Ground |
+| 2 | ID | OTG ID — leave NC for device mode |
 | 3 | D+ | USB data + |
-| 4 | ID | OTG ID — leave NC for device mode |
-| 5 | GND | Ground |
-| MP1/MP2 | Shell | Mechanical tabs — tie to GND pour |
+| 4 | D− | USB data − |
+| 5 | VBUS | +5 V from USB host |
+| MP1/MP2 | Shell | Mechanical tabs (right side) — tie to GND pour |
 
 ### Footprint Dimensions (datasheet File No. 719)
 - Signal pad pitch: **0.8 mm**, size: **0.5 × 1.6 mm**

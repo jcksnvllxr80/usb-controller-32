@@ -6,7 +6,6 @@
     (exclude_from_sim no)
     (in_bom yes)
     (on_board yes)
-
     (property "Reference" "J"
       (at 0 8.89 0)
       (effects (font (size 1.27 1.27)))
@@ -27,7 +26,6 @@
       (at 0 1.778 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-
     (symbol "USB_MiniB_Adafruit_Breakout_0_1"
       (rectangle
         (start -5.08 6.096)
@@ -35,36 +33,33 @@
         (stroke (width 0.254) (type default))
         (fill (type background))
       )
-
       (polyline
-        (pts (xy -2.54 4.572) (xy 2.54 4.572) (xy 1.778 2.286) (xy -1.778 2.286) (xy -2.54 4.572))
+        (pts (xy 0.762 4.572) (xy 5.08 4.572) (xy 5.08 -4.572) (xy 0.762 -4.572) (xy 0.762 4.572))
         (stroke (width 0.254) (type default))
         (fill (type none))
       )
-
-      (polyline (pts (xy -1.27 3.81) (xy -1.27 2.794))
+      (polyline (pts (xy 1.524 3.302) (xy 1.524 -3.302))
+        (stroke (width 0.508) (type default)) (fill (type none)))
+      (polyline (pts (xy 2.286 2.54) (xy 2.286 -2.54))
         (stroke (width 0.254) (type default)) (fill (type none)))
-      (polyline (pts (xy -0.635 3.81) (xy -0.635 2.794))
+      (polyline (pts (xy 3.048 1.778) (xy 3.048 -1.778))
         (stroke (width 0.254) (type default)) (fill (type none)))
-      (polyline (pts (xy 0 3.81) (xy 0 2.794))
+      (polyline (pts (xy 3.81 1.016) (xy 3.81 -1.016))
         (stroke (width 0.254) (type default)) (fill (type none)))
-      (polyline (pts (xy 0.635 3.81) (xy 0.635 2.794))
-        (stroke (width 0.254) (type default)) (fill (type none)))
-      (polyline (pts (xy 1.27 3.81) (xy 1.27 2.794))
+      (polyline (pts (xy 4.572 0.508) (xy 4.572 -0.508))
         (stroke (width 0.254) (type default)) (fill (type none)))
     )
-
     (symbol "USB_MiniB_Adafruit_Breakout_1_1"
       (pin power_in line
         (at -10.16 5.08 0)
         (length 5.08)
-        (name "VBUS" (effects (font (size 1.27 1.27))))
+        (name "GND" (effects (font (size 1.27 1.27))))
         (number "1" (effects (font (size 1.27 1.27))))
       )
-      (pin bidirectional line
+      (pin passive line
         (at -10.16 2.54 0)
         (length 5.08)
-        (name "D-" (effects (font (size 1.27 1.27))))
+        (name "ID" (effects (font (size 1.27 1.27))))
         (number "2" (effects (font (size 1.27 1.27))))
       )
       (pin bidirectional line
@@ -73,16 +68,16 @@
         (name "D+" (effects (font (size 1.27 1.27))))
         (number "3" (effects (font (size 1.27 1.27))))
       )
-      (pin passive line
+      (pin bidirectional line
         (at -10.16 -2.54 0)
         (length 5.08)
-        (name "ID" (effects (font (size 1.27 1.27))))
+        (name "D-" (effects (font (size 1.27 1.27))))
         (number "4" (effects (font (size 1.27 1.27))))
       )
       (pin power_in line
         (at -10.16 -5.08 0)
         (length 5.08)
-        (name "GND" (effects (font (size 1.27 1.27))))
+        (name "VBUS" (effects (font (size 1.27 1.27))))
         (number "5" (effects (font (size 1.27 1.27))))
       )
     )
