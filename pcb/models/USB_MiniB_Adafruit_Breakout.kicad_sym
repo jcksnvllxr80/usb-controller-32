@@ -29,7 +29,6 @@
     )
 
     (symbol "USB_MiniB_Adafruit_Breakout_0_1"
-      ;; Body rectangle
       (rectangle
         (start -5.08 6.096)
         (end 5.08 -6.096)
@@ -37,14 +36,12 @@
         (fill (type background))
       )
 
-      ;; USB Mini-B trapezoid shape (decorative)
       (polyline
         (pts (xy -2.54 4.572) (xy 2.54 4.572) (xy 1.778 2.286) (xy -1.778 2.286) (xy -2.54 4.572))
         (stroke (width 0.254) (type default))
         (fill (type none))
       )
 
-      ;; Contact pins inside connector body
       (polyline (pts (xy -1.27 3.81) (xy -1.27 2.794))
         (stroke (width 0.254) (type default)) (fill (type none)))
       (polyline (pts (xy -0.635 3.81) (xy -0.635 2.794))
@@ -58,35 +55,30 @@
     )
 
     (symbol "USB_MiniB_Adafruit_Breakout_1_1"
-      ;; Pin 1: VBUS (+5V)
       (pin power_in line
         (at -10.16 5.08 0)
         (length 5.08)
         (name "VBUS" (effects (font (size 1.27 1.27))))
         (number "1" (effects (font (size 1.27 1.27))))
       )
-      ;; Pin 2: D-
       (pin bidirectional line
         (at -10.16 2.54 0)
         (length 5.08)
         (name "D-" (effects (font (size 1.27 1.27))))
         (number "2" (effects (font (size 1.27 1.27))))
       )
-      ;; Pin 3: D+
       (pin bidirectional line
         (at -10.16 0 0)
         (length 5.08)
         (name "D+" (effects (font (size 1.27 1.27))))
         (number "3" (effects (font (size 1.27 1.27))))
       )
-      ;; Pin 4: ID (OTG, typically NC or GND)
       (pin passive line
         (at -10.16 -2.54 0)
         (length 5.08)
         (name "ID" (effects (font (size 1.27 1.27))))
         (number "4" (effects (font (size 1.27 1.27))))
       )
-      ;; Pin 5: GND
       (pin power_in line
         (at -10.16 -5.08 0)
         (length 5.08)

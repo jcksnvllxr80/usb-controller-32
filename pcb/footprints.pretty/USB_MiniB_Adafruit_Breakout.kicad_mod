@@ -1,12 +1,10 @@
 (footprint "USB_MiniB_Adafruit_Breakout"
   (version 20231120)
   (generator pcbnew)
-  (description "Adafruit Mini-B USB Breakout, SMD, per datasheet File No. 719")
+  (descr "Adafruit Mini-B USB Breakout, SMD, per datasheet File No. 719")
   (tags "USB Mini-B SMD breakout Adafruit")
   (layer "F.Cu")
   (attr smd)
-
-  ;; ── Reference & Value ──────────────────────────────────────────────────────
   (fp_text reference "J1"
     (at 0 -6.5 0)
     (layer "F.SilkS")
@@ -17,83 +15,59 @@
     (layer "F.Fab")
     (effects (font (size 1 1) (thickness 0.15)))
   )
-
-  ;; ── Signal pads (5 contacts, 0.8 mm pitch, centred on X=0) ─────────────────
-  ;; Pad width 0.5 mm, length 1.6 mm (contact depth from PCB layout)
-  ;; Pitch: 0.8 mm  →  offsets: -1.6, -0.8, 0, +0.8, +1.6
   (pad "1" smd rect
-    (at -1.6 0 0)
+    (at -1.6 0)
     (size 0.5 1.6)
     (layers "F.Cu" "F.Paste" "F.Mask")
-    (net 0 "")
   )
   (pad "2" smd rect
-    (at -0.8 0 0)
+    (at -0.8 0)
     (size 0.5 1.6)
     (layers "F.Cu" "F.Paste" "F.Mask")
-    (net 0 "")
   )
   (pad "3" smd rect
-    (at 0 0 0)
+    (at 0 0)
     (size 0.5 1.6)
     (layers "F.Cu" "F.Paste" "F.Mask")
-    (net 0 "")
   )
   (pad "4" smd rect
-    (at 0.8 0 0)
+    (at 0.8 0)
     (size 0.5 1.6)
     (layers "F.Cu" "F.Paste" "F.Mask")
-    (net 0 "")
   )
   (pad "5" smd rect
-    (at 1.6 0 0)
+    (at 1.6 0)
     (size 0.5 1.6)
     (layers "F.Cu" "F.Paste" "F.Mask")
-    (net 0 "")
   )
-
-  ;; ── Shell / mounting tabs (2 pads, ±3.40 mm from centre, per PCB layout) ──
-  ;; Shell pads: 1.8 mm wide × 3.0 mm long
   (pad "MP1" smd rect
-    (at -3.4 1.25 0)
+    (at -3.4 1.25)
     (size 1.8 3.0)
     (layers "F.Cu" "F.Paste" "F.Mask")
-    (net 0 "")
   )
   (pad "MP2" smd rect
-    (at 3.4 1.25 0)
+    (at 3.4 1.25)
     (size 1.8 3.0)
     (layers "F.Cu" "F.Paste" "F.Mask")
-    (net 0 "")
   )
-
-  ;; ── Courtyard ──────────────────────────────────────────────────────────────
-  ;; Overall: 9.90 mm wide × 5.50 mm deep (from datasheet front view)
   (fp_rect
     (start -4.95 -1.35)
     (end 4.95 4.15)
     (layer "F.CrtYd")
     (stroke (width 0.05) (type default))
   )
-
-  ;; ── Fab layer outline ──────────────────────────────────────────────────────
   (fp_rect
     (start -4.4 -0.85)
     (end 4.4 3.65)
     (layer "F.Fab")
     (stroke (width 0.1) (type default))
   )
-
-  ;; ── Silkscreen ─────────────────────────────────────────────────────────────
-  ;; Outer body outline
   (fp_rect
     (start -4.5 -1.0)
     (end 4.5 3.75)
     (layer "F.SilkS")
     (stroke (width 0.12) (type default))
   )
-
-  ;; Pin 1 indicator (small triangle/line near pad 1)
   (fp_line
     (start -2.1 -1.3)
     (end -2.1 -1.7)
@@ -112,7 +86,4 @@
     (layer "F.SilkS")
     (stroke (width 0.12) (type default))
   )
-
-  ;; ── 3D model placeholder ───────────────────────────────────────────────────
-  ;; (3D model path intentionally omitted; add your own .step/.wrl)
 )
