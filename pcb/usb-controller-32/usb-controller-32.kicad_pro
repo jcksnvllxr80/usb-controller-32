@@ -430,9 +430,9 @@
       "endpoint_off_grid": "warning",
       "extra_units": "error",
       "field_name_whitespace": "warning",
-      "footprint_filter": "ignore",
+      "footprint_filter": "warning",
       "footprint_link_issues": "warning",
-      "four_way_junction": "ignore",
+      "four_way_junction": "warning",
       "ground_pin_not_ground": "warning",
       "hier_label_mismatch": "error",
       "isolated_pin_label": "warning",
@@ -450,14 +450,14 @@
       "no_connect_dangling": "warning",
       "pin_not_connected": "error",
       "pin_not_driven": "error",
-      "pin_to_pin": "warning",
+      "pin_to_pin": "error",
       "power_pin_not_driven": "error",
       "same_local_global_label": "warning",
       "similar_label_and_power": "warning",
       "similar_labels": "warning",
       "similar_power": "warning",
-      "simulation_model_issue": "ignore",
-      "single_global_label": "ignore",
+      "simulation_model_issue": "warning",
+      "single_global_label": "warning",
       "stacked_pin_name": "warning",
       "unannotated": "error",
       "unconnected_wire_endpoint": "warning",
@@ -582,12 +582,42 @@
           "label": "Datasheet",
           "name": "Datasheet",
           "show": true
+        },
+        {
+          "group_by": false,
+          "label": "Sim.Pins",
+          "name": "Sim.Pins",
+          "show": false
+        },
+        {
+          "group_by": false,
+          "label": "Sim.Type",
+          "name": "Sim.Type",
+          "show": false
+        },
+        {
+          "group_by": false,
+          "label": "Sim.Device",
+          "name": "Sim.Device",
+          "show": false
+        },
+        {
+          "group_by": false,
+          "label": "Description",
+          "name": "Description",
+          "show": false
+        },
+        {
+          "group_by": false,
+          "label": "#",
+          "name": "${ITEM_NUMBER}",
+          "show": false
         }
       ],
       "filter_string": "",
       "group_symbols": true,
       "include_excluded_from_bom": true,
-      "name": "Default Editing",
+      "name": "",
       "sort_asc": true,
       "sort_field": "Reference"
     },
@@ -632,7 +662,7 @@
         "uuid": "0df98f2e-e784-4feb-8fde-1ac2a09b72c2"
       }
     ],
-    "used_designators": "J1",
+    "used_designators": "#FLG1-5,R1-38,J1-3,SW1-18,D1,#PWR19,#PWR22-67,C1-27,Y2",
     "variants": []
   },
   "sheets": [
