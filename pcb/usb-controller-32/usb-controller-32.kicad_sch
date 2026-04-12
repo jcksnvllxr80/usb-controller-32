@@ -17473,7 +17473,7 @@
 				)
 			)
 		)
-		(property "Footprint" "extra:Crystal_HC49-U_Vertical_20MHz"
+		(property "Footprint" "Crystal:Crystal_HC49-4H_Vertical"
 			(at 260.35 101.6 0)
 			(hide yes)
 			(show_name no)
