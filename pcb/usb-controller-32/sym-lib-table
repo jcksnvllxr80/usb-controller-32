@@ -1,0 +1,4 @@
+(sym_lib_table
+	(version 7)
+	(lib (name "extra") (type "KiCad") (uri "C:/Users/A-A-Ron/git/usb-controller-32/pcb/models") (options "") (descr ""))
+)

@@ -1,0 +1,47 @@
+(footprint "Crystal_HC49-U_Vertical_20MHz"
+  (version 20231120)
+  (generator kicad_pcb)
+  (layer "F.Cu")
+  (descr "HC-49/U through-hole crystal, 4.88mm pitch, body 11.5x10.3mm")
+  (tags "crystal HC49 through-hole vertical 20MHz")
+  (attr through_hole)
+
+  (fp_text reference "Y1"
+    (at 0 -7.5 0)
+    (layer "F.SilkS")
+    (effects (font (size 1 1) (thickness 0.15)))
+  )
+  (fp_text value "20MHz"
+    (at 0 7.5 0)
+    (layer "F.Fab")
+    (effects (font (size 1 1) (thickness 0.15)))
+  )
+
+  (fp_line (start -5.75 -5.15) (end 5.75 -5.15) (layer "F.SilkS") (stroke (width 0.12) (type default)))
+  (fp_line (start -5.75 5.15) (end 5.75 5.15) (layer "F.SilkS") (stroke (width 0.12) (type default)))
+  (fp_line (start -5.75 -5.15) (end -5.75 5.15) (layer "F.SilkS") (stroke (width 0.12) (type default)))
+  (fp_line (start 5.75 -5.15) (end 5.75 5.15) (layer "F.SilkS") (stroke (width 0.12) (type default)))
+
+  (fp_line (start -5.75 -5.15) (end 5.75 -5.15) (layer "F.CrtYd") (stroke (width 0.05) (type default)))
+  (fp_line (start -5.75 5.15) (end 5.75 5.15) (layer "F.CrtYd") (stroke (width 0.05) (type default)))
+  (fp_line (start -5.75 -5.15) (end -5.75 5.15) (layer "F.CrtYd") (stroke (width 0.05) (type default)))
+  (fp_line (start 5.75 -5.15) (end 5.75 5.15) (layer "F.CrtYd") (stroke (width 0.05) (type default)))
+
+  (fp_line (start -5.75 -5.15) (end 5.75 -5.15) (layer "F.Fab") (stroke (width 0.1) (type default)))
+  (fp_line (start -5.75 5.15) (end 5.75 5.15) (layer "F.Fab") (stroke (width 0.1) (type default)))
+  (fp_line (start -5.75 -5.15) (end -5.75 5.15) (layer "F.Fab") (stroke (width 0.1) (type default)))
+  (fp_line (start 5.75 -5.15) (end 5.75 5.15) (layer "F.Fab") (stroke (width 0.1) (type default)))
+
+  (pad "1" thru_hole circle
+    (at -2.44 0)
+    (size 1.4 1.4)
+    (drill 0.7)
+    (layers "*.Cu" "*.Mask")
+  )
+  (pad "2" thru_hole circle
+    (at 2.44 0)
+    (size 1.4 1.4)
+    (drill 0.7)
+    (layers "*.Cu" "*.Mask")
+  )
+)

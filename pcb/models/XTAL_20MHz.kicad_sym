@@ -1,0 +1,74 @@
+(kicad_symbol_lib
+  (version 20231120)
+  (generator kicad_symbol_editor)
+  (symbol "XTAL_20MHz"
+    (pin_names (offset 1.016))
+    (exclude_from_sim no)
+    (in_bom yes)
+    (on_board yes)
+    (property "Reference" "Y"
+      (at 0 5.08 0)
+      (effects (font (size 1.27 1.27)))
+    )
+    (property "Value" "20MHz"
+      (at 0 -5.08 0)
+      (effects (font (size 1.27 1.27)))
+    )
+    (property "Footprint" "Crystal_HC49-U_Vertical_20MHz:Crystal_HC49-U_Vertical_20MHz"
+      (at 0 -7.62 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property "Datasheet" ""
+      (at 0 -10.16 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property "Frequency" "20MHz"
+      (at 0 -12.7 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property "Package" "HC-49/U"
+      (at 0 -15.24 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (symbol "XTAL_20MHz_0_1"
+      (rectangle
+        (start -2.032 -2.032)
+        (end 2.032 2.032)
+        (stroke (width 0.254) (type default))
+        (fill (type background))
+      )
+      (polyline
+        (pts (xy -2.032 -3.048) (xy -2.032 3.048))
+        (stroke (width 0.508) (type default))
+        (fill (type none))
+      )
+      (polyline
+        (pts (xy 2.032 -3.048) (xy 2.032 3.048))
+        (stroke (width 0.508) (type default))
+        (fill (type none))
+      )
+      (polyline
+        (pts (xy -3.81 0) (xy -2.032 0))
+        (stroke (width 0.254) (type default))
+        (fill (type none))
+      )
+      (polyline
+        (pts (xy 2.032 0) (xy 3.81 0))
+        (stroke (width 0.254) (type default))
+        (fill (type none))
+      )
+    )
+    (symbol "XTAL_20MHz_1_1"
+      (pin passive line
+        (at -7.62 0 0) (length 3.81)
+        (name "1" (effects (font (size 1.016 1.016))))
+        (number "1" (effects (font (size 1.016 1.016))))
+      )
+      (pin passive line
+        (at 7.62 0 180) (length 3.81)
+        (name "2" (effects (font (size 1.016 1.016))))
+        (number "2" (effects (font (size 1.016 1.016))))
+      )
+    )
+  )
+)
