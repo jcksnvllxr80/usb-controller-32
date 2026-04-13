@@ -194,6 +194,12 @@ usb-controller-32/
 └── README.md
 ```
 
+## Sponsor
+
+PCB prototyping for this project is sponsored by [PCBWay](https://www.pcbway.com/).
+
+PCBWay makes it easy to go from design files to manufactured boards. Upload your Gerber files, pick your board specs (layers, thickness, surface finish, color, etc.), and get an instant quote. Orders typically ship within a few days. Their online ordering process is straightforward — just create an account, upload your files, review the specs, and check out.
+
 ## License
 
 See Microchip's license terms in the source file headers.
